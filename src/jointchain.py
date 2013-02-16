@@ -35,7 +35,7 @@ class JointChain:
         """
         #initialise the object's attributes
         
-        pass   
+        self.m_joints = []   
     
     def genJoints(self, _templateJnts, _jntNames):
         
@@ -57,7 +57,56 @@ class JointChain:
         
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
-        pass
+        #check that the number of template joints match the number of names provided
+        
+        numTemplateJnts = len(_templateJnts)
+        numNames =  len(_jntNames)
+        
+        #if not return error string
+        
+        if numTemplateJnts != numNames:
+            
+            return "Error: number of names provided does not equal the number of template joints"
+                
+        #otherwise create the joints
+        
+        else:
+            
+            #make sure the selection is clear
+            
+            pm.select(clear = True)
+        
+            #cycle through the joints
+            
+            i = 0;
+            
+            while i < numTemplateJnts:
+                
+                #add a joint to the list of joints in the joint chain
+                
+                self.m_joints.append(pm.joint(name = _jntNames[i]))
+                
+                #set the translation and rotation of the joint
+                
+                self.m_joints[i].setTranslation(_templateJnts[i].getTranslation(space = 'world'))
+                self.m_joints[i].setRotation(_templateJnts[i].getRotation(space = 'world'))
+                
+                #move all rotations to the joint orient
+                
+                pm.makeIdentity(self.m_joints[i], r=True, a=True)
+                
+                #if it isnt the first joint
+                
+                if i!= 0:
+                
+                    #make the joint created before the current one the parent of the joint
+                
+                    self.m_joints[i].setParent(self.m_joints[i-1])
+                
+                #clear selection and increment i
+                
+                pm.select(clear = True)
+                i = i+1
         
     def genFromMirror(self, _mirrorChain):
         
@@ -89,17 +138,7 @@ class JointChain:
 jnts = pm.ls(type = 'joint', selection = True)
 print jnts
 
-pm.select(clear = True)
+chain = JointChain()
 
-joint1 = pm.joint(name = "niceJNTNAME")
-joint1.setTranslation(jnts[0].getTranslation(space = 'world'))
-joint1.setRotation(jnts[0].getRotation(space = 'world'))
-pm.makeIdentity(joint1, r=True, a=True)
-
-
-joint2 = pm.joint(name = "niceJNTNAME2")
-joint2.setTranslation(jnts[1].getTranslation(space = 'object'))
-joint2.setRotation(jnts[1].getRotation(space = 'object'))
-pm.makeIdentity(joint2, r=True, a=True)
-
+chain.genJoints(jnts, ("cool_joint_1","cool_joint_3","Cool_Joint_4"))
 
