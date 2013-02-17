@@ -1,10 +1,11 @@
 #----------Imports----------#
 
 import pymel.core as pm
+import pRigging.src.riggingbase as prb
 
 #----------JointChain-Class----------#
 
-class JointChain:    
+class JointChain(prb.RiggingBase):    
     
     """
         Class: JointChain
@@ -17,9 +18,15 @@ class JointChain:
         Contains:
             self.m_joints:          A list of the joints contained int he joint chain
                                     ordered from parent to child.
+            self.m_ext:             A string containing the extension to be added to the
+                                    names passed in to the generation method 
         
         Imports:
-            pymel.core
+            pymel.core as pm
+            pRigging.src.riggingbase as prb
+            
+        Inherits:
+            prb.RiggingBase
     """
     
     def __init__(self):
@@ -35,7 +42,10 @@ class JointChain:
         """
         #initialise the object's attributes
         
-        self.m_joints = []   
+        self.m_joints = []
+        self.m_ext = "JNT"
+        
+        """--------------------"""
     
     def genJoints(self, _templateJnts, _jntNames):
         
@@ -45,7 +55,7 @@ class JointChain:
                 _templateJnts, assigning the names, _jntNames to them  
             
             Inputs:
-                self:                   A pointer to the instance of the GUI class of which
+                self:                   A pointer to the instance of the JointChain class of which
                                         this method is being called
                 _templateJnts:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
@@ -62,16 +72,22 @@ class JointChain:
         numTemplateJnts = len(_templateJnts)
         numNames =  len(_jntNames)
         
+
+        
         #if not return error string
         
         if numTemplateJnts != numNames:
             
             return "Error: number of names provided does not equal the number of template joints"
-                
+       
         #otherwise create the joints
         
         else:
+
+            #add the extension to the names
             
+            _jntNames = self.addExtToNames(_jntNames, self.m_ext)
+
             #make sure the selection is clear
             
             pm.select(clear = True)
@@ -88,8 +104,7 @@ class JointChain:
                 
                 #set the translation and rotation of the joint
                 
-                self.m_joints[i].setTranslation(_templateJnts[i].getTranslation(space = 'world'))
-                self.m_joints[i].setRotation(_templateJnts[i].getRotation(space = 'world'))
+                self.transAndOrientObj (self.m_joints[i], _templateJnts[i])
                 
                 #move all rotations to the joint orient
                 
@@ -107,6 +122,8 @@ class JointChain:
                 
                 pm.select(clear = True)
                 i = i+1
+                
+        """--------------------"""
         
     def genFromMirror(self, _mirrorChain):
         
@@ -116,7 +133,7 @@ class JointChain:
                 object, _mirror chain, and renames them correctly 
             
             Inputs:
-                self:                   A pointer to the instance of the GUI class of which
+                self:                   A pointer to the instance of the JointChain class of which
                                         this method is being called
                 _mirrorChain:           A jointChain object that will be mirrored to generate the
                                         new jointChain object
@@ -129,16 +146,8 @@ class JointChain:
         
         pass
         
+        """--------------------"""
+        
 
             
 #----------END-JointChain-Class----------#  
-
-###TEST_CODE###
-
-jnts = pm.ls(type = 'joint', selection = True)
-print jnts
-
-chain = JointChain()
-
-chain.genJoints(jnts, ("cool_joint_1","cool_joint_3","Cool_Joint_4"))
-
