@@ -88,7 +88,7 @@ class RiggingBase:
     def removeExtFromNames(self, _names):
         
         """
-            Method: addExtToNames
+            Method: removeExtToNames
                 a method which removes an extension from a name by searching for the last underscore
             
             Inputs:
@@ -112,6 +112,18 @@ class RiggingBase:
                 #set the new name to be the old name except what was after the undercore
                 
                 _names[i] = _names[i][:index]
+                
+            #and then remove any long,name path influence from the name
+            
+            index =  _names[i].rfind("|")
+            
+            #check that there was an uderscore and only edit the name if there was
+            
+            if index >= 0:
+            
+                #set the new name to be the old name except what was after the undercore
+                
+                _names[i] = _names[i][index:]
 
         return _names
         
@@ -147,6 +159,7 @@ class RiggingBase:
             _subject.setRotation(_destObj.getRotation(space = 'world'), space = 'world')       
         
         """--------------------"""
+    
     def addGroupOverObj (self, _groupName, _obj, _orient = True):
         
         """
@@ -185,5 +198,48 @@ class RiggingBase:
         
         """--------------------"""          
 
+    def breakConnection (self, _attr,):
+        
+        """
+            Method: breakConnection
+                a method which breaks a connection driving an attribute and removes the driver if 
+                there are no more connections from the driver and it is a constraint (to ensure meshes)
+                are not removed if they're not driving anything
+            
+            Inputs:
+                self:                   A pointer to the instance of the RiggingBase class of which
+                                        this method is being called
+                _attr:                  The attribute having it's connection broken
+            
+            On Exit:                    The connection has been removed                       
+        """
+        
+        #check that the attribute is connected
+        
+        if _attr.isConnected():
+
+            #save the driver object
+            
+            driver = _attr.connections()
+            
+            #make a set of the driver list for later comparison
+            
+            a = set(driver)
+            
+            #disconnect the attribute
+            
+            _attr.disconnect()
+            
+            #if the type of the driver was a constraint and there 
+            #are no more connections
+            
+            if ("Constraint" in driver[0].nodeType()) and len(set(driver[0].outputs())-a) == 0:
+                
+                #remove the driver object
+                
+                pm.delete(driver[0])            
+              
+        
+        """--------------------"""   
             
 #----------END-RiggingBase-Class----------#  
