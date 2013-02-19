@@ -51,6 +51,8 @@ class RiggingBase:
             On Exit:                    The extensions have been added to the name strings                      
         """
         
+        returnList = []
+        
         #early breakout if no extension is supplied
 
         if _ext == "":
@@ -77,11 +79,11 @@ class RiggingBase:
                 
             #add the extension to the name
             
-            _names[i] = _names[i] + _ext
+            returnList.append( _names[i] + _ext)
         
         #return the list of names
 
-        return _names        
+        return returnList       
         
         """--------------------"""
         
@@ -101,9 +103,11 @@ class RiggingBase:
             
         for i in range (0, (len(_names))):
             
+            returnList = _names
+            
             #find the last _ in the name
             
-            index =  _names[i].rfind("_")
+            index =  returnList[i].rfind("_")
             
             #check that there was an uderscore and only edit the name if there was
             
@@ -111,11 +115,11 @@ class RiggingBase:
             
                 #set the new name to be the old name except what was after the undercore
                 
-                _names[i] = _names[i][:index]
+                returnList[i] = returnList[i][:index]
                 
             #and then remove any long,name path influence from the name
             
-            index =  _names[i].rfind("|")
+            index =  returnList[i].rfind("|")
             
             #check that there was an uderscore and only edit the name if there was
             
@@ -123,9 +127,9 @@ class RiggingBase:
             
                 #set the new name to be the old name except what was after the undercore
                 
-                _names[i] = _names[i][index:]
+                returnList[i] = returnList[i][index:]
 
-        return _names
+        return returnList
         
         """--------------------"""
         
@@ -241,5 +245,5 @@ class RiggingBase:
               
         
         """--------------------"""   
-            
+       
 #----------END-RiggingBase-Class----------#  

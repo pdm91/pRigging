@@ -274,7 +274,7 @@ class Control(prb.RiggingBase):
                     
                     #set the group name
                         
-                    groupName = self.addExtToNames( self.removeExtFromNames([self.m_control]), _grpExts[i])[0]
+                    groupName = self.addExtToNames( [self.m_control], _grpExts[i])[0]
                     
                     #if the caller has specified that thegroups should be inserted over the
                     #control object, or there are no groups and it is the first iteration
@@ -569,5 +569,16 @@ class Control(prb.RiggingBase):
                 
                 self.m_groups[0].setParent(_parent)    
                 
-                                 
+    def getCtrl (self):
+        
+        """
+            Method: getCtrl
+                A method that returns the control              
+            
+            On Exit:                    retuns the control object                      
+        """                                 
+        
+        return self.m_control
+        
+        
 #----------END-Control-Class----------#  a

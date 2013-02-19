@@ -2,10 +2,12 @@
 
 import pymel.core as pm
 import pRigging.src.jointchain as pjc
+import pRigging.src.riggingbase as prb
+import pRigging.src.control as pctrl
 
 #----------FKChain-Class----------#
 
-class FKChain:    
+class FKChain(prb.RiggingBase):    
     
     """
         Class: FKChain
@@ -38,15 +40,16 @@ class FKChain:
         #initialise the object's attributes
         
         self.m_jointChain = pjc.JointChain()
+        self.m_controls = []
         
         """--------------------"""
     
-    def genChain(self, _templateJnts, _Names):
+    def genChain(self, _templateJnts, _names):
         
         """
             Method: genChain
-                a method which generates a joint chain as a duplicate of the input chain,
-                _templateJnts, assigning the names, _jntNames to them  
+                a method which generates an FKChain as a duplicate of the input chain,
+                _templateJnts, assigning the names, _names to them  
             
             Inputs:
                 self:                   A pointer to the instance of the FKChain class of which
@@ -62,9 +65,39 @@ class FKChain:
                                         and they have both been connected together                        
         """
         
+        #add FK extension to the names
+        
+        _names = self.addExtToNames( _names, "FK")
+        
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
-        pass
+        self.m_jointChain.genJoints(_templateJnts, _names)
+        
+        #for each joint in the list
+        
+        jntList = self.m_jointChain.getJntList()
+        
+        i = 0
+        
+        for jnt in jntList:
+            
+            #make a control based on the list, connect it with an orient constraint
+            
+            self.m_controls.append(pctrl.Control())
+            self.m_controls[i].genCTRL(jnt, _name = self.removeExtFromNames([_names[i]])[0], _addConstToObj = ["orient"])
+            
+            i = i + 1
+            
+        #then set them in their hierarchical structure
+        
+        for i in range(len(self.m_controls)-1, 0, -1):
+            
+            #set the parent of the selected control to the control before it in the list
+            
+            self.m_controls[i].setCtrlParent(self.m_controls[i-1].getCtrl())
+            
+        pm.select(cl = True)
+        
         
         """--------------------"""
         
@@ -94,4 +127,3 @@ class FKChain:
 
             
 #----------END-FKChain-Class----------#  
-

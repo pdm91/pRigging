@@ -86,7 +86,7 @@ class JointChain(prb.RiggingBase):
 
             #add the extension to the names
             
-            _jntNames = self.addExtToNames(_jntNames, self.m_ext)
+            newNames = self.addExtToNames(_jntNames, self.m_ext)
 
             #make sure the selection is clear
             
@@ -100,7 +100,7 @@ class JointChain(prb.RiggingBase):
                 
                 #add a joint to the list of joints in the joint chain
                 
-                self.m_joints.append(pm.joint(name = _jntNames[i]))
+                self.m_joints.append(pm.joint(name = newNames[i]))
                 
                 #set the translation and rotation of the joint
                 
@@ -148,6 +148,15 @@ class JointChain(prb.RiggingBase):
         
         """--------------------"""
         
-
+    def getJntList(self):
+        
+        """
+            Method: getJntList
+                a method which returns the list of the joints incorporated in the joint chain
+                
+            On Exit:                    returns a list of the joints in the chain
+        """
+        
+        return self.m_joints
             
 #----------END-JointChain-Class----------#  
