@@ -130,3 +130,8 @@ class FKChain(prb.RiggingBase):
 
             
 #----------END-FKChain-Class----------#  
+
+reload(prb)
+
+test = FKChain()
+test.genChain(pm.ls(sl = True), ["t","tt","ttt"])

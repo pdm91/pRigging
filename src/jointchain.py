@@ -159,26 +159,21 @@ class JointChain(prb.RiggingBase):
         
         return self.m_joints
         
-    def getTopJoint(self):
+        """--------------------"""
+        
+    def getJoint(self, _id):
         
         """
             Method: getTopJoint
-                a method which returns the top joint in the joint chain hierarchy.
+                a method which returns the specified joint in the joint chain hierarchy.
                 
             On Exit:                    returns the top joint in the joint chain hierarchy
         """
         
-        return self.m_joints[0]
+        return self.m_joints[_id]
         
-    def getBottomJoint(self):
+        """--------------------"""
         
-        """
-            Method: getBottomJoint
-                a method to return the lowedt joint in the joint chain hierarchy
-                
-            On Exit:                    returns the bottom joint
-        """
-        
-        return self.m_joints[-1]
+
             
 #----------END-JointChain-Class----------#  

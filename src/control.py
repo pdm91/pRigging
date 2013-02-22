@@ -519,6 +519,14 @@ class Control(prb.RiggingBase):
                 #set up a parent constraint between the control and the template object
                 
                 self.m_outConstraints.append(pm.scaleConstraint(self.m_control,_drivenObj, mo = True, sk = ssList)) 
+            
+            #for the polevector constraint
+            
+            elif (_const == "poleVector"):
+                
+                #set up a parent constraint between the control and the template object
+                
+                self.m_outConstraints.append(pm.poleVectorConstraint(self.m_control,_drivenObj)) 
 
 
         """--------------------"""            
@@ -567,7 +575,9 @@ class Control(prb.RiggingBase):
                 
                 #parent the top group under the parent
                 
-                self.m_groups[0].setParent(_parent)    
+                self.m_groups[0].setParent(_parent)  
+                
+        """--------------------"""  
                 
     def getCtrl (self):
         
@@ -579,6 +589,75 @@ class Control(prb.RiggingBase):
         """                                 
         
         return self.m_control
+        
+        """--------------------"""
+        
+    def getTopGrp (self):
+        
+        """
+            Method: getTopGrp
+                A method that returns top group of the control             
+            
+            On Exit:                    retuns the group                      
+        """                                 
+        
+        if len(self.m_groups) != 0:
+        
+            return self.m_groups[0]
+            
+        else:
+            
+            return self.m_control
+        
+        """--------------------"""
+        
+    def offsetTopGroup (self, _x, _y, _z, _os = True, _r = True):
+        
+        """
+            Method:
+                a method to offset the top group of the control structure
+                
+            Inputs:
+                _x:                     The x offset
+                _y:                     The y offset
+                _z:                     The z offset
+                _os:                    defaults to true 
+                _r:                     defaults to true
+                
+            On Exit:
+                the top group of the control structure has been offset based 
+                on the input
+                
+        """
+        #set up the space defining string
+        
+        sp = "world"
+        
+        if _os == True:
+            
+            sp = "preTransform"
+        
+        #if relative = true
+        if _r:
+            
+            if len(self.m_groups) == 0:
+            
+                self.m_control.translateBy((_x, _y, _z), space = sp)
+            
+            else:
+                
+                self.m_groups[0].translateBy((_x, _y, _z), space = sp)
+        
+        else:
+             if len(self.m_groups) == 0:
+            
+                self.m_control.setTranslation((_x, _y, _z), space = sp)
+            
+             else:
+                
+                self.m_groups[0].setTranslation((_x, _y, _z), space = sp)
+           
+        """--------------------"""
         
         
 #----------END-Control-Class----------#  a

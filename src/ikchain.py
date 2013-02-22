@@ -98,19 +98,44 @@ class IKChain(prb.RiggingBase):
                 
         self.m_ikHandle = pm.ikHandle(
                                 name = handleName,
-                                startJoint = self.m_jointChain.getTopJoint(), 
-                                endEffector = self.m_jointChain.getBottomJoint(),
+                                startJoint = self.m_jointChain.getJoint(0), 
+                                endEffector = self.m_jointChain.getJoint(-1),
                                 sol = solver)[0] #0 so that just the handle is stored
         
         #and the control for it
-        
+        print self.m_ikHandle
         self.m_ikControl.genCTRL(self.m_ikHandle)
         
         #and set it as the parent of the IK handle
         
         self.m_ikHandle.setParent(self.m_ikControl.getCtrl())
+        
+        if solver == "ikRPsolver":
+            
+            #make a pole vector control
+            #set the name for the control
+            
+            pvName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([_names[0]])), "IK"), "PV")[0]
+            
+            #add the control
+            
+            self.m_ikPVControl.genCTRL(self.m_jointChain.getJoint(1), _name= pvName)
+    
+            #offset offsets the group
+            
+            self.m_ikPVControl.offsetTopGroup (-5, 0, 0, _os = True, _r = True)
+            
+            #set the consraint
+            
+            self.m_ikPVControl.addConstraint("poleVector", self.m_ikHandle)
+            
+            self.m_ikPVControl.setCtrlParent(self.m_ikControl.getCtrl())
+            
+            self.m_ikPVControl.getTopGrp().setRotation((0,0,0), space = "world")            
+        
             
         pm.select(cl = True)
+        
         
         
         """--------------------"""
@@ -143,6 +168,11 @@ class IKChain(prb.RiggingBase):
 #----------END-IKChain-Class----------#  
 
 reload(pjc)
-
+reload(pctrl)
 test = IKChain()
 test.genChain(pm.ls(sl = True), ["test_1","test_2","test_3"])
+
+t = pctrl.Control()
+pm.ls(sl = True)[0].setRotation((0,0,0), space = "world")
+t.offsetTopGroup(5,0,0,_r = True, _os = False)
+t.m_groups[0].translateBy((5,0,0), space = "preTransform")

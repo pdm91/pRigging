@@ -80,6 +80,18 @@ class RiggingBase:
             #add the extension to the name
             
             returnList.append( _names[i] + _ext)
+            
+            #and then remove any long,name path influence from the name
+            
+            index =  returnList[i].rfind("|")
+            
+            #check that there was an uderscore and only edit the name if there was
+            
+            if index >= 0:
+            
+                #set the new name to be the old name except what was after the undercore
+                
+                returnList[i] = returnList[i][index:]
         
         #return the list of names
 
