@@ -256,7 +256,7 @@ class RiggingBase:
                 pm.delete(driver[0])            
               
         
-        """--------------------"""   
+        """--------------------""" 
         
     def orientByAim(self,
                     _object,
