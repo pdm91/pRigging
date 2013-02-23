@@ -257,5 +257,89 @@ class RiggingBase:
               
         
         """--------------------"""   
+        
+    def orientByAim(self,
+                    _object,
+                    _aimTarget,
+                    _upObj = "",
+                    _objUp = False,
+                    _objRotUp = True,
+                    _aimAxis = (1.0,0.0,0.0),
+                    _upAxis = (0.0,1.0,0.0),
+                    _leaveAim = False
+                    ):
+                        
+        """
+            Method: orientByAim
+                a method which sets the rotaition of an object by aim constraining it to another object
+            
+            Inputs:
+                self:                   A pointer to the instance of the RiggingBase class of which
+                                        this method is being called
+                _object:                The object to bw aimed
+                _aimTarget:             The object that the aimed object will be pointing at
+                _upObj:                 Defaults to an empty string, sets the object that will 
+                                        define the up vector of the aim constraint, if not set,
+                                        the world up will be used
+                _objUp:                 Uses the object up  option which sets the up vector 
+                                        to aim at the up object, defaults to false
+                _objRotUp:              uses the objects rotation to set the up vector for the
+                                        aim Constraint
+                _aimVec:                Defines which axis to aim
+                _upVec:                 Defines the up axis of the constraint
+                _leaveAim:              Defaults to False, defines whether or not the aim constraint is left
+                                        in existance 
+            
+            On Exit:                The object has been rotated to match the settings                       
+        """
+        
+        #set the world up type string
+        
+        upType = "scene"
+        
+        if _objUp == True or _objRotUp == False and _upObj != "":
+            
+            upType = "object"
+            
+        elif _upObj != "":
+            
+            upType = "objectRotation"
+            
+        const = ""
+            
+        #make the constraint
+        
+        if _upObj == "":
+            
+            const= pm.aimConstraint(
+                                _aimTarget,
+                                _object, 
+                                mo = False, 
+                                aim = _aimAxis, 
+                                u = _upAxis, 
+                                wu = _upAxis, 
+                                wut = upType
+                                )
+                                
+        else:
+            
+            const= pm.aimConstraint(
+                                _aimTarget,
+                                _object, 
+                                mo = False, 
+                                aim = _aimAxis, 
+                                u = _upAxis, 
+                                wu = _upAxis,
+                                wuo = _upObj, 
+                                wut = upType
+                                )
+        
+        #if the constraint is meant to be deleted
+        
+        if not _leaveAim:
+            
+            pm.delete(const)
+                          
+        """--------------------"""
        
 #----------END-RiggingBase-Class----------#  

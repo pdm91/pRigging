@@ -124,12 +124,200 @@ class JointChain(prb.RiggingBase):
                 i = i+1
                 
         """--------------------"""
+
+    def genFromTopAndBottom(
+                            self,
+                            _topJnt,
+                            _bottomJnt,
+                            _numJnts,
+                            _nameList = [], 
+                            _name = "", 
+                            _posOnTop = False,
+                            _pot = False, 
+                            _posOnBottom = False,
+                            _pob = False,
+                            _parentToTop = True,
+                            _ptt = True
+                            ):
+                            
+        """
+            Method: genFromTopAndBottom
+                a method which generates a joint chain  positioned between the bottom and top
+                joint specified
+            
+            Inputs:
+                self:                   A pointer to the instance of the JointChain class of which
+                                        this method is being called
+                _topJnt:                The top joint used to define the joint chain, this is the top
+                                        in hierarchy, not the top in position.
+                _bottomJnt:             The bottom joint used to define the joint chain.
+                _numJnts:               The number of joints to generate
+                _nameList:              A list of names to use as the base for the names of the joints,
+                                        must all be unique, defaults to an empty list.
+                _name:                  A single base name for the joints, will have numbering added to it
+                                        before it being assigned. If neither the name list nor the name 
+                                        parameter is set the name will be generated from the top joint 
+                                        passed in
+                _posOnTop:              Defaults to False, specifies whether or not one of the joints
+                                        should be placed on the top joint.
+                _pot:                   Short name for _posOnTop
+                _posOnBottom:           Defaults to False, specifies whether or not to position one of
+                                        the joints should be placed on the bottom joint.
+                _pob:                   Short name for _posOnBottom
+                _parentToTop:           Defaults to True, specifies whether or not to parent the top
+                                        of the joint chain to the top joint passed in
+                _ptt:                   Sort name for _parentToTop
+               
+            On Exit:                    The joints have been generated and parented together
+                                        and named correctly                          
+        """
         
+        #get the position in world space of the two joints passed in
+        
+        topPos = _topJnt.getTranslation(space='world')
+        bottomPos = _bottomJnt.getTranslation(space='world')
+        
+        #and the vector between them
+        
+        vector = bottomPos-topPos
+        
+        #set up the names
+        
+        newNames = []
+        
+        #if no names were passed in,
+        
+        if (_nameList == [] or len(_nameList) != _numJnts) and _name == "":
+            
+            #set the base name
+            
+            nameBase = self.removeExtFromNames([_topJnt.name()])[0]
+            
+            #for each name that's being created
+            
+            for i in range (0, _numJnts):
+                
+                #add a number as an extension and put the name into the list
+                
+                newNames.append(self.addExtToNames([nameBase], str(i+1))[0])
+                
+        #if the single name was passed in
+        
+        elif (_nameList == [] or len(_nameList) != _numJnts) and _name != "":
+            
+            for i in range (0, _numJnts):
+                
+                newNames.append(self.addExtToNames([_name],str(i+1))[0])
+               
+       #if the list was passed in it takes precidence
+                
+        else:
+            
+            for name in _nameList:
+                
+                newNames.append(name)
+                
+        #add the joint extension
+        
+        newNames = self.addExtToNames(newNames,self.m_ext)
+                
+        #generate the joints:
+            
+        for jntName in newNames:
+            
+            #clear the selection
+            
+            pm.select( cl = True )
+            
+            #and make the joints
+            
+            self.m_joints.append(pm.joint(name = jntName))
+            
+        pm.select(cl = True)
+
+        #make a list of the propotions along the vector for each joint to be positioned
+        
+        vecMultiplier = []
+        
+        #first calculate the divisor
+        
+        divisor = _numJnts+1
+        
+        if _posOnTop or _pot:
+            
+            divisor = divisor - 1
+            
+        if _posOnBottom or _pob:
+            
+            divisor = divisor - 1
+            
+        #then claculate the proportions
+        
+        proportions = 1.0/divisor
+        
+        #finally, loop through for each joint that is not co positioned 
+        #with one of the input joints
+        
+        for i in range(0,(divisor - 1)):
+            
+            #append the multiplier
+            
+            vecMultiplier.append(proportions*(i+1))
+            
+        #then if either the top of or the bottom joints are meant to be in
+        #place as the inputted joints, add those multipliers 
+        
+        if _posOnTop or _pot:
+            
+            vecMultiplier.insert(0,0)
+            
+        if _posOnBottom or _pob:
+            
+            vecMultiplier.append(1)
+            
+        #finally loop through each joint and set the position and orientation and freeze transformations
+        #and do the parenting
+        
+        for i in range (0,len(self.m_joints)):
+            
+            self.m_joints[i].setTranslation(topPos+(vector*vecMultiplier[i]))
+            
+            #add a clause for if it's the last joint and it is in the same position as
+            #the bottom joint
+            
+            if i == len(self.m_joints)-1 and (_pob or _posOnBottom):
+                
+                self.m_joints[i].setParent(self.m_joints[i-1])
+                self.m_joints[i].jointOrientX.set(0)
+                self.m_joints[i].jointOrientY.set(0)
+                self.m_joints[i].jointOrientZ.set(0)
+                
+            else:    
+            
+                self.orientByAim(self.m_joints[i],_bottomJnt, _upObj = _topJnt)              
+                pm.makeIdentity(self.m_joints[i], r=True, a=True)
+                
+                #if it's not the root, parent it under the one higher up the hierarchy
+                
+                if i != 0:
+                    
+                    self.m_joints[i].setParent(self.m_joints[i-1])
+                    
+        #parent the top joint to the top joint passed in if chosen and clear selection
+        
+        if _ptt and _parentToTop:
+            
+            self.m_joints[0].setParent(_topJnt)
+                    
+        pm.select (cl = True)
+                        
+        """--------------------"""    
+            
     def genFromMirror(self, _mirrorChain):
         
         """
             Method: genFromMirror
-                a method which generates a joint chain as a duplicate of the input jointChain
+                a method which generates a joint chain as a mirrored duplicate of the input jointChain
                 object, _mirror chain, and renames them correctly 
             
             Inputs:
@@ -173,7 +361,7 @@ class JointChain(prb.RiggingBase):
         return self.m_joints[_id]
         
         """--------------------"""
-        
+    
 
             
-#----------END-JointChain-Class----------#  
+#----------END-JointChain-Class----------# 

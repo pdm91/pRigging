@@ -166,13 +166,3 @@ class IKChain(prb.RiggingBase):
 
             
 #----------END-IKChain-Class----------#  
-
-reload(pjc)
-reload(pctrl)
-test = IKChain()
-test.genChain(pm.ls(sl = True), ["test_1","test_2","test_3"])
-
-t = pctrl.Control()
-pm.ls(sl = True)[0].setRotation((0,0,0), space = "world")
-t.offsetTopGroup(5,0,0,_r = True, _os = False)
-t.m_groups[0].translateBy((5,0,0), space = "preTransform")
