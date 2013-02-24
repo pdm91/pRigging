@@ -103,7 +103,7 @@ class IKChain(prb.RiggingBase):
                                 sol = solver)[0] #0 so that just the handle is stored
         
         #and the control for it
-        print self.m_ikHandle
+
         self.m_ikControl.genCTRL(self.m_ikHandle)
         
         #and set it as the parent of the IK handle
@@ -127,7 +127,7 @@ class IKChain(prb.RiggingBase):
             
             #set the consraint
             
-            self.m_ikPVControl.addConstraint("poleVector", self.m_ikHandle)
+            self.m_ikPVControl.addConstraint("poleVector", self.m_ikHandle, self.m_ikPVControl.getCtrl())
             
             self.m_ikPVControl.setCtrlParent(self.m_ikControl.getCtrl())
             

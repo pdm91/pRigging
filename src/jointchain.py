@@ -87,7 +87,7 @@ class JointChain(prb.RiggingBase):
             #add the extension to the names
             
             newNames = self.addExtToNames(_jntNames, self.m_ext)
-
+            
             #make sure the selection is clear
             
             pm.select(clear = True)
@@ -99,6 +99,8 @@ class JointChain(prb.RiggingBase):
             while i < numTemplateJnts:
                 
                 #add a joint to the list of joints in the joint chain
+                #NOTE: if inputted name is just a number the joint creation method
+                #removes that number from the start of the name
                 
                 self.m_joints.append(pm.joint(name = newNames[i]))
                 
@@ -346,6 +348,19 @@ class JointChain(prb.RiggingBase):
         """
         
         return self.m_joints
+        
+        """--------------------"""
+        
+    def getNumJnts(self):
+        
+        """
+            Method: getNumJnts
+                a method which returns the list number of joints in the joint chain
+                
+            On Exit:                    returns the number of joints
+        """
+        
+        return len(self.m_joints)
         
         """--------------------"""
         

@@ -140,6 +140,8 @@ class RiggingBase:
                 #set the new name to be the old name except what was after the undercore
                 
                 returnList[i] = returnList[i][index:]
+                
+        print returnList
 
         return returnList
         
@@ -341,5 +343,235 @@ class RiggingBase:
             pm.delete(const)
                           
         """--------------------"""
+        
+    def addConstraint(self, _const, _drivenObj, _driverList,
+                        _force = False, _f = False, 
+                        _tx = False, _ty = False, _tz = False, _t = True,
+                        _rx = False, _ry = False, _rz = False, _r = True,
+                        _sx = False, _sy = False, _sz = False, _s = True
+                      ):
+            
+        """
+            Method: addConstraint
+                A method that adds constraints from the driverList to the specified object
+            
+            Inputs:
+                _const:                 A string defining the constraint type
+                _drivenObject:          The child object of the Constraint
+                _driverList:            The driver objects
+                _force:                 Defaults to false, defines whther or not to replace 
+                                        existing contraints with the one specified, if left false,
+                                        the constraint will be put onto attributes that aren't 
+                                        already controlled, is set to true any confilcting 
+                                        connections will be broken and replaced witht he inputted 
+                                        ones 
+                _f:                     Short name for _force
+                attribute specifics:    These are keyword arguments for each axis of translate
+                                        rotate and scale, default to false, if all values pertinant
+                                        to the specified constraint are false, defaults will be used
+                                        (i.e. all of them) if any of them are set, those ones will be
+                                        constrained and the ones left at the default of false will not.
+                                        The _t, _r and _s keywords give the option to turn off all three
+                                        axis in any given transformation type.  
+                                        The keywords and default settings:
+                                             
+                        _tx = False, _ty = False, _tz = False, _t = True,
+                        _rx = False, _ry = False, _rz = False, _r = True,
+                        _sx = False, _sy = False, _sz = False, _s = True                 
+
+            
+            On Exit:                    The specified constraints have been added to the control                       
+        """              
+                      
+        #first check that a constraint has been entered
+        
+        if _const != "":
+            
+            #set boolean values for whether or not to constrain each transformation in each axis
+            
+            #create a boolean which says whether or not any of the translate, rotation, and scale 
+            #attributes are connected
+            
+            doTrans = ((_drivenObj.tx.isFreeToChange()  
+                        and _drivenObj.ty.isFreeToChange() 
+                        and _drivenObj.tz.isFreeToChange() ) or (_f or _force)) and _t
+            doRot = ((_drivenObj.rx.isFreeToChange() 
+                        and _drivenObj.ry.isFreeToChange() 
+                        and _drivenObj.rz.isFreeToChange() ) or (_f or _force)) and _r
+                        
+                        
+            doScale = ((_drivenObj.sx.isFreeToChange()  
+                        and _drivenObj.sy.isFreeToChange() 
+                        and _drivenObj.sz.isFreeToChange() ) or (_f or _force)) and _s
+            
+            #then make a boolean for each transformation type which sayes whether all of the 
+            #individual values were left at default
+            
+            transSet = _tx or _ty or _tz
+            rotSet = _rx or _ry or _rz
+            sclSet = _sx or _sy or _sz
+            
+            #switch through constraint types
+            
+            if (_const == "parent" and (doTrans or doRot)):
+                
+                #set up skip strings based on the boolean inputs and checks
+                
+                stList = []
+                srList = []
+                
+                #if translate is not meant to be contrained
+                
+                if not doTrans:
+                
+                    #add all of the strings to the list
+                
+                    stList = ["x","y","z"]
+                    
+                #otherwise
+                
+                else: 
+                
+                #if one or more of the translate axis flags are set
+                
+                    if transSet:
+                        
+                        #add the appropriate strings to the list
+                        
+                        if not _tx:
+                            stList.append("x")
+                        if not _ty:
+                            stList.append("y")
+                        if not _tz:
+                            stList.append("z")
+                            
+                    #if force is set, break all rotate conenctions
+                    
+                    if _f or _force:
+                        
+                        self.breakConnection(_drivenObj.tx)
+                        self.breakConnection(_drivenObj.ty)
+                        self.breakConnection(_drivenObj.tz)
+                
+                #repeat for rotate
+                        
+                if not doRot:
+                
+                    srList = ["x","y","z"]
+                                  
+                else:
+                    
+                    if rotSet:
+                    
+                        #add the appropriate strings to the list
+                        
+                        if not _rx:
+                            srList.append("x")
+                        if not _ry:
+                            srList.append("y")
+                        if not _rz:
+                            srList.append("z")
+                            
+                    if _f or _force:
+                        
+                        self.breakConnection(_drivenObj.rx)
+                        self.breakConnection(_drivenObj.ry)
+                        self.breakConnection(_drivenObj.rz)
+    
+                #set up a parent constraint between the control and the template object
+                                
+                return pm.parentConstraint(_driverList,_drivenObj, mo = True, st = stList, sr = srList)
+            
+            #if orient constraint is chosen and the constraint is meant to be made
+            
+            elif (_const == "orient" and doRot):
+                
+                srList = []
+                
+                #and some of the rotate axis flags have been set
+                
+                if rotSet:
+                    
+                    if not _rx:
+                        srList.append("x")
+                    if not _ry:
+                        srList.append("y")
+                    if not _rz:
+                        srList.append("z")
+                        
+                #if force is set breack connections
+                
+                if _f or _force:
+                        
+                        self.breakConnection(_drivenObj.rx)
+                        self.breakConnection(_drivenObj.ry)
+                        self.breakConnection(_drivenObj.rz) 
+                
+                    
+                #set up an orient constraint between the control and the template object
+                
+                return pm.orientConstraint(_driverList,_drivenObj, mo = True, sk = srList)
+
+            elif (_const == "point" and doTrans):
+                
+                stList = []
+                
+                if transSet:
+                    
+                    #add the appropriate strings to the list
+                    
+                    if not _tx:
+                        stList.append("x")
+                    if not _ty:
+                        stList.append("y")
+                    if not _tz:
+                        stList.append("z")
+                        
+                #if force is set breack connections
+                
+                if _f or _force:
+                        
+                        self.breakConnection(_drivenObj.tx)
+                        self.breakConnection(_drivenObj.ty)
+                        self.breakConnection(_drivenObj.tz)
+                            
+                #set up a parent constraint between the control and the template object
+                
+                return pm.pointConstraint(_driverList,_drivenObj, mo = True, sk = stList)
+
+            elif (_const == "scale" and doScale):
+                
+                ssList = []
+                
+                if sclSet:
+                    
+                    #add the appropriate strings to the list
+                    
+                    if not _sx:
+                        ssList.append("x")
+                    if not _sy:
+                        ssList.append("y")
+                    if not _sz:
+                        ssList.append("z")
+                
+                #if force is set breack connections
+                
+                if _f or _force:
+                        
+                        self.breakConnection(_drivenObj.sx)
+                        self.breakConnection(_drivenObj.sy)
+                        self.breakConnection(_drivenObj.sz)
+                                    
+                #set up a parent constraint between the control and the template object
+                
+                return pm.scaleConstraint(_driverList,_drivenObj, mo = True, sk = ssList)
+            
+            #for the polevector constraint
+            
+            elif (_const == "poleVector"):
+                
+                #set up a parent constraint between the control and the template object
+                
+                return pm.poleVectorConstraint(_driverList,_drivenObj)
        
 #----------END-RiggingBase-Class----------#  
