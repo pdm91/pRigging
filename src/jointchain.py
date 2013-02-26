@@ -47,19 +47,19 @@ class JointChain(prb.RiggingBase):
         
         """--------------------"""
     
-    def genJoints(self, _templateJnts, _jntNames):
+    def genJoints(self, _templateJoints, _jointNames):
         
         """
             Method: genJoints
                 a method which generates a joint chain as a duplicate of the input chain,
-                _templateJnts, assigning the names, _jntNames to them  
+                _templateJoints, assigning the names, _jointNames to them  
             
             Inputs:
                 self:                   A pointer to the instance of the JointChain class of which
                                         this method is being called
-                _templateJnts:          A list of the joints in the chain that is used to 
+                _templateJoints:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jntNames:              A list of names for the joints to be called
+                _jointNames:              A list of names for the joints to be called
             
             On Exit:                    The joints have been generated and parented together
                                         and named correctly                          
@@ -69,14 +69,14 @@ class JointChain(prb.RiggingBase):
         
         #check that the number of template joints match the number of names provided
         
-        numTemplateJnts = len(_templateJnts)
-        numNames =  len(_jntNames)
+        numTemplateJoints = len(_templateJoints)
+        numNames =  len(_jointNames)
         
 
         
         #if not return error string
         
-        if numTemplateJnts != numNames:
+        if numTemplateJoints != numNames:
             
             return "Error: number of names provided does not equal the number of template joints"
        
@@ -86,7 +86,7 @@ class JointChain(prb.RiggingBase):
 
             #add the extension to the names
             
-            newNames = self.addExtToNames(_jntNames, self.m_ext)
+            newNames = self.addExtToNames(_jointNames, self.m_ext)
             
             #make sure the selection is clear
             
@@ -96,7 +96,7 @@ class JointChain(prb.RiggingBase):
             
             i = 0;
             
-            while i < numTemplateJnts:
+            while i < numTemplateJoints:
                 
                 #add a joint to the list of joints in the joint chain
                 #NOTE: if inputted name is just a number the joint creation method
@@ -106,7 +106,7 @@ class JointChain(prb.RiggingBase):
                 
                 #set the translation and rotation of the joint
                 
-                self.transAndOrientObj (self.m_joints[i], _templateJnts[i])
+                self.transAndOrientObj (self.m_joints[i], _templateJoints[i])
                 
                 #move all rotations to the joint orient
                 
@@ -129,9 +129,9 @@ class JointChain(prb.RiggingBase):
 
     def genFromTopAndBottom(
                             self,
-                            _topJnt,
-                            _bottomJnt,
-                            _numJnts,
+                            _topJoint,
+                            _bottomJoint,
+                            _numJoints,
                             _nameList = [], 
                             _name = "", 
                             _posOnTop = False,
@@ -150,10 +150,10 @@ class JointChain(prb.RiggingBase):
             Inputs:
                 self:                   A pointer to the instance of the JointChain class of which
                                         this method is being called
-                _topJnt:                The top joint used to define the joint chain, this is the top
+                _topJoint:                The top joint used to define the joint chain, this is the top
                                         in hierarchy, not the top in position.
-                _bottomJnt:             The bottom joint used to define the joint chain.
-                _numJnts:               The number of joints to generate
+                _bottomJoint:             The bottom joint used to define the joint chain.
+                _numJoints:               The number of joints to generate
                 _nameList:              A list of names to use as the base for the names of the joints,
                                         must all be unique, defaults to an empty list.
                 _name:                  A single base name for the joints, will have numbering added to it
@@ -176,8 +176,8 @@ class JointChain(prb.RiggingBase):
         
         #get the position in world space of the two joints passed in
         
-        topPos = _topJnt.getTranslation(space='world')
-        bottomPos = _bottomJnt.getTranslation(space='world')
+        topPos = _topJoint.getTranslation(space='world')
+        bottomPos = _bottomJoint.getTranslation(space='world')
         
         #and the vector between them
         
@@ -189,15 +189,15 @@ class JointChain(prb.RiggingBase):
         
         #if no names were passed in,
         
-        if (_nameList == [] or len(_nameList) != _numJnts) and _name == "":
+        if (_nameList == [] or len(_nameList) != _numJoints) and _name == "":
             
             #set the base name
             
-            nameBase = self.removeExtFromNames([_topJnt.name()])[0]
+            nameBase = self.removeExtFromNames([_topJoint.name()])[0]
             
             #for each name that's being created
             
-            for i in range (0, _numJnts):
+            for i in range (0, _numJoints):
                 
                 #add a number as an extension and put the name into the list
                 
@@ -205,9 +205,9 @@ class JointChain(prb.RiggingBase):
                 
         #if the single name was passed in
         
-        elif (_nameList == [] or len(_nameList) != _numJnts) and _name != "":
+        elif (_nameList == [] or len(_nameList) != _numJoints) and _name != "":
             
-            for i in range (0, _numJnts):
+            for i in range (0, _numJoints):
                 
                 newNames.append(self.addExtToNames([_name],str(i+1))[0])
                
@@ -225,7 +225,7 @@ class JointChain(prb.RiggingBase):
                 
         #generate the joints:
             
-        for jntName in newNames:
+        for jointName in newNames:
             
             #clear the selection
             
@@ -233,7 +233,7 @@ class JointChain(prb.RiggingBase):
             
             #and make the joints
             
-            self.m_joints.append(pm.joint(name = jntName))
+            self.m_joints.append(pm.joint(name = jointName))
             
         pm.select(cl = True)
 
@@ -243,7 +243,7 @@ class JointChain(prb.RiggingBase):
         
         #first calculate the divisor
         
-        divisor = _numJnts+1
+        divisor = _numJoints+1
         
         if _posOnTop or _pot:
             
@@ -296,7 +296,7 @@ class JointChain(prb.RiggingBase):
                 
             else:    
             
-                self.orientByAim(self.m_joints[i],_bottomJnt, _upObj = _topJnt)              
+                self.orientByAim(self.m_joints[i],_bottomJoint, _upObj = _topJoint)              
                 pm.makeIdentity(self.m_joints[i], r=True, a=True)
                 
                 #if it's not the root, parent it under the one higher up the hierarchy
@@ -309,7 +309,7 @@ class JointChain(prb.RiggingBase):
         
         if _ptt and _parentToTop:
             
-            self.m_joints[0].setParent(_topJnt)
+            self.m_joints[0].setParent(_topJoint)
                     
         pm.select (cl = True)
                         
@@ -338,10 +338,10 @@ class JointChain(prb.RiggingBase):
         
         """--------------------"""
         
-    def getJntList(self):
+    def getJointList(self):
         
         """
-            Method: getJntList
+            Method: getJointList
                 a method which returns the list of the joints incorporated in the joint chain
                 
             On Exit:                    returns a list of the joints in the chain
@@ -351,10 +351,10 @@ class JointChain(prb.RiggingBase):
         
         """--------------------"""
         
-    def getNumJnts(self):
+    def getNumJoints(self):
         
         """
-            Method: getNumJnts
+            Method: getNumJoints
                 a method which returns the list number of joints in the joint chain
                 
             On Exit:                    returns the number of joints

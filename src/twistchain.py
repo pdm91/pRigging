@@ -47,9 +47,9 @@ class TwistChain(prb.RiggingBase):
         """--------------------"""
         
     def genTwistChain(self,
-                        _topJnt,
-                        _bottomJnt,
-                        _numJnts,
+                        _topJoint,
+                        _bottomJoint,
+                        _numJoints,
                         _nameList = [], 
                         _name = "",
                         _addConnection = True,
@@ -65,10 +65,10 @@ class TwistChain(prb.RiggingBase):
             Inputs:
                 self:                   A pointer to the instance of the object being
                                         created.
-                _topJnt:                The top joint that the twist chain will be parented
+                _topJoint:                The top joint that the twist chain will be parented
                                         under
-                _bottomJnt:             The joint that will drive the chain's x rotations
-                _numJnts:               The number of joints to make
+                _bottomJoint:             The joint that will drive the chain's x rotations
+                _numJoints:               The number of joints to make
                 _nameList:              A list of names, if not specified the name will be 
                                         generated from the top joint
                 _name:                  A name, if not specified it will be generated from 
@@ -82,9 +82,9 @@ class TwistChain(prb.RiggingBase):
         
         #generate the joint Chain
         
-        self.m_jointChain.genFromTopAndBottom(_topJnt,
-                                                _bottomJnt,
-                                                _numJnts,
+        self.m_jointChain.genFromTopAndBottom(_topJoint,
+                                                _bottomJoint,
+                                                _numJoints,
                                                 _nameList = _nameList, 
                                                 _name = _name
                                                 )
@@ -107,13 +107,13 @@ class TwistChain(prb.RiggingBase):
                 
             else:
                 
-                multName = self.addExtToNames(self.removeExtFromNames([_topJnt]),"MULT")[0]
+                multName = self.addExtToNames(self.removeExtFromNames([_topJoint]),"MULT")[0]
                 
             #make a multiply node to set the influence scale
             
             self.m_multNode = pm.shadingNode('multiplyDivide', name = multName, au = True)
             
-            self.m_multNode.input1X.set(1.0/(_numJnts+1))
+            self.m_multNode.input1X.set(1.0/(_numJoints+1))
             
             #switch through the _attr strings
             #at the moment there is a lot of repeated code, might finde a nicer way of doing this
@@ -124,99 +124,99 @@ class TwistChain(prb.RiggingBase):
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.rx.connect(self.m_multNode.input2X)
+                _bottomJoint.rx.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputX.connect(jnt.rx)
+                    self.m_multNode.outputX.connect(joint.rx)
                     
             elif _attr == "ry":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.ry.connect(self.m_multNode.input2X)
+                _bottomJoint.ry.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputX.connect(jnt.ry)
+                    self.m_multNode.outputX.connect(joint.ry)
                     
             elif _attr == "rz":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.rz.connect(self.m_multNode.input2X)
+                _bottomJoint.rz.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputX.connect(jnt.rz)
+                    self.m_multNode.outputX.connect(joint.rz)
                     
             elif _attr == "tx":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.tx.connect(self.m_multNode.input2X)
+                _bottomJoint.tx.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputX.connect(jnt.tx)
+                    self.m_multNode.outputX.connect(joint.tx)
                     
             elif _attr == "ty":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.ty.connect(self.m_multNode.input2X)
+                _bottomJoint.ty.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputy.connect(jnt.ty)
+                    self.m_multNode.outputX.connect(joint.ty)
                     
             elif _attr == "tz":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.tz.connect(self.m_multNode.input2X)
+                _bottomJoint.tz.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outputz.connect(jnt.tz)
+                    self.m_multNode.outputZ.connect(joint.tz)
                     
             elif _attr == "sx":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.sx.connect(self.m_multNode.input2X)
+                _bottomJoint.sx.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outpusx.connect(jnt.sx)
+                    self.m_multNode.outputX.connect(joint.sx)
                     
             elif _attr == "sy":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.sy.connect(self.m_multNode.input2X)
+                _bottomJoint.sy.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outpusy.connect(jnt.sy)
+                    self.m_multNode.outputX.connect(joint.sy)
                     
             elif _attr == "sz":
                 
                 #connect the value on the bottom joint to the mult node and the output of
                 #that to drive the twist joints
                 
-                _bottomJnt.sz.connect(self.m_multNode.input2X)
+                _bottomJoint.sz.connect(self.m_multNode.input2X)
                 
-                for jnt in self.m_jointChain.getJntList():
+                for joint in self.m_jointChain.getJointList():
                     
-                    self.m_multNode.outpusz.connect(jnt.sz)
+                    self.m_multNode.outputZ.connect(joint.sz)
                             
         
         """--------------------"""
@@ -245,14 +245,3 @@ class TwistChain(prb.RiggingBase):
         """--------------------"""
         
 #----------END-TwistChain-Class----------#  
-
-test = TwistChain()
-test.genTwistChain(pm.ls(sl = True)[0],
-                        pm.ls(sl = True)[1],
-                        4,
-                        _nameList = [], 
-                        _name = "",
-                        _addConnection = True,
-                        _acon = True,
-                        _attr = "rz")
-                        

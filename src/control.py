@@ -51,7 +51,7 @@ class Control(prb.RiggingBase):
         
         """--------------------"""
     
-    def genCTRL(
+    def genCtrl(
                 self, 
                 _templateObj, 
                 _name = "", 
@@ -60,7 +60,7 @@ class Control(prb.RiggingBase):
                 _noGroups = False,
                 _controlExtOverride = "",
                 _cExt = "",
-                _addConstToObj = [],
+                _addConstraintToObj = [],
                 _const = [],
                 _orientToTemplate = True,
                 _orient = True,
@@ -70,7 +70,7 @@ class Control(prb.RiggingBase):
               ):
         
         """
-            Method: genCTRL
+            Method: genCtrl
                 A method that generates a control based on an input object with optional additional
                 inputs.
             
@@ -92,12 +92,12 @@ class Control(prb.RiggingBase):
                 _controlExtOverride:    Overrides the default CTRL extension when set, when an empty
                                         default is used
                 _cExt:                  Short name for _controlExtOverride
-                _addConstToObj:         Adds a constraint between the control and the template joint
+                _addConstraintToObj:    Adds a constraint between the control and the template joint
                                         with the control as the driver. takes a list of strings
                                         representing constraints, "parent","orient","point" and "scale"
                                         are currently dealt with. If not set, or un-handled strings are
                                         entered no constraints are created
-                _const:                 Short name for _addConstToObj
+                _const:                 Short name for _addConstraintToObj
                 _orientToTemplate:      Defaults to True, oriebnts the control to the template object
                                         passed in, if off it is alligned to the world
                 _orient:                Short name for _orientToTemplate
@@ -197,17 +197,17 @@ class Control(prb.RiggingBase):
             
             #check if either of the const keyword arguments had values set in them 
                         
-            if _addConstToObj != [] or _const != []:
+            if _addConstraintToObj != [] or _const != []:
                 
                 #make a set from both argument lists removing duplicates
                 
-                constSet = set(_addConstToObj + _const)
+                constSet = set(_addConstraintToObj + _const)
                                 
                 #then cycle through the list of constraints to add 
                 
-                for const in constSet:
+                for constraint in constSet:
                     
-                    self.m_outConstraints.append(self.addConstraint(const, _templateObj,self.m_control))
+                    self.m_outConstraints.append(self.addConstraint(constraint, _templateObj,self.m_control))
             
             #finally, if the _parent flag was set, parent the top of the control hierarchy under
             #the parent object specified

@@ -59,7 +59,7 @@ class FKChain(prb.RiggingBase):
                                         this method is being called
                 _templateJnts:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jntNames:              A list of names for the joints to be called,
+                _jointNames:              A list of names for the joints to be called,
                                         used as a basis for the control names as well,
                                         names are uncompleted, and will be added to as
                                         they get passed down through the object structure
@@ -78,16 +78,16 @@ class FKChain(prb.RiggingBase):
         
         #for each joint in the list
         
-        jntList = self.m_jointChain.getJntList()
+        jointList = self.m_jointChain.getJntList()
         
         i = 0
         
-        for jnt in jntList:
+        for joint in jointList:
             
             #make a control based on the list, connect it with an orient constraint
             
             self.m_controls.append(pctrl.Control())
-            self.m_controls[i].genCTRL(jnt, _name = self.removeExtFromNames([newNames[i]])[0], _addConstToObj = ["orient"])
+            self.m_controls[i].genCtrl(joint, _name = self.removeExtFromNames([newNames[i]])[0], _addConstraintToObj = ["orient"])
             
             i = i + 1
             

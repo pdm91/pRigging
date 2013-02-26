@@ -307,13 +307,13 @@ class RiggingBase:
             
             upType = "objectRotation"
             
-        const = ""
+        constraint = ""
             
         #make the constraint
         
         if _upObj == "":
             
-            const= pm.aimConstraint(
+            constraint= pm.aimConstraint(
                                 _aimTarget,
                                 _object, 
                                 mo = False, 
@@ -325,7 +325,7 @@ class RiggingBase:
                                 
         else:
             
-            const= pm.aimConstraint(
+            constraint= pm.aimConstraint(
                                 _aimTarget,
                                 _object, 
                                 mo = False, 
@@ -340,11 +340,11 @@ class RiggingBase:
         
         if not _leaveAim:
             
-            pm.delete(const)
+            pm.delete(constraint)
                           
         """--------------------"""
         
-    def addConstraint(self, _const, _drivenObj, _driverList,
+    def addConstraint(self, _constraint, _drivenObj, _driverList,
                         _force = False, _f = False, 
                         _tx = False, _ty = False, _tz = False, _t = True,
                         _rx = False, _ry = False, _rz = False, _r = True,
@@ -356,7 +356,7 @@ class RiggingBase:
                 A method that adds constraints from the driverList to the specified object
             
             Inputs:
-                _const:                 A string defining the constraint type
+                _constraint:            A string defining the constraint type
                 _drivenObject:          The child object of the Constraint
                 _driverList:            The driver objects
                 _force:                 Defaults to false, defines whther or not to replace 
@@ -385,7 +385,7 @@ class RiggingBase:
                       
         #first check that a constraint has been entered
         
-        if _const != "":
+        if _constraint != "":
             
             #set boolean values for whether or not to constrain each transformation in each axis
             
@@ -413,7 +413,7 @@ class RiggingBase:
             
             #switch through constraint types
             
-            if (_const == "parent" and (doTrans or doRot)):
+            if (_constraint == "parent" and (doTrans or doRot)):
                 
                 #set up skip strings based on the boolean inputs and checks
                 
@@ -484,7 +484,7 @@ class RiggingBase:
             
             #if orient constraint is chosen and the constraint is meant to be made
             
-            elif (_const == "orient" and doRot):
+            elif (_constraint == "orient" and doRot):
                 
                 srList = []
                 
@@ -512,7 +512,7 @@ class RiggingBase:
                 
                 return pm.orientConstraint(_driverList,_drivenObj, mo = True, sk = srList)
 
-            elif (_const == "point" and doTrans):
+            elif (_constraint == "point" and doTrans):
                 
                 stList = []
                 
@@ -539,7 +539,7 @@ class RiggingBase:
                 
                 return pm.pointConstraint(_driverList,_drivenObj, mo = True, sk = stList)
 
-            elif (_const == "scale" and doScale):
+            elif (_constraint == "scale" and doScale):
                 
                 ssList = []
                 
@@ -568,7 +568,7 @@ class RiggingBase:
             
             #for the polevector constraint
             
-            elif (_const == "poleVector"):
+            elif (_constraint == "poleVector"):
                 
                 #set up a parent constraint between the control and the template object
                 

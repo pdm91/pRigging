@@ -26,8 +26,6 @@ class BindChain(prb.RiggingBase):
             pRigging.src.jointchain as pjc
             import pRigging.src.twistchain as ptc
             pRigging.src.riggingbase as prb
-            pRigging.src.control as pctrl
-
     """
     
     def __init__(self):
@@ -48,19 +46,19 @@ class BindChain(prb.RiggingBase):
         
         """--------------------"""
     
-    def genChain(self, _templateJnts, _names, _twistJointStartIDs = [], _tjsIDs = [], _numTwistJnts = 3):
+    def genChain(self, _templateJoints, _names, _twistJointStartIDs = [], _tjsIDs = [], _numTwistJoints = 3):
         
         """
             Method: genChain
                 a method which generates a BindChain as a duplicate of the input chain,
-                _templateJnts, assigning the names, _names to them  
+                _templateJoints, assigning the names, _names to them  
             
             Inputs:
                 self:                   A pointer to the instance of the BindChain class of which
                                         this method is being called
-                _templateJnts:          A list of the joints in the chain that is used to 
+                _templateJoints:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jntNames:              A list of names for the joints to be called,
+                _jointNames:              A list of names for the joints to be called,
                                         used as a basis for the control names as well,
                                         names are uncompleted, and will be added to as
                                         they get passed down through the object structure
@@ -68,7 +66,7 @@ class BindChain(prb.RiggingBase):
                                         the twist chain starts from the joint stored in the ID passed
                                         in to the next joint in the hierarchy.
                 _tjsIDs:                Short name for _twistJointStartIDs
-                _numTwistJnts:          The number of twist joints to add into each twist chain,
+                _numTwistJoints:          The number of twist joints to add into each twist chain,
                                         ignored if there are no indices set. 
             
             On Exit:                    The Bind chain has been generated                        
@@ -80,11 +78,11 @@ class BindChain(prb.RiggingBase):
         
         #generate the joint chain        
         
-        self.m_jointChain.genJoints(_templateJnts, newNames)
+        self.m_jointChain.genJoints(_templateJoints, newNames)
         
         #generate the appropriate twistChains
         
-        jntList = self.m_jointChain.getJntList()
+        jointList = self.m_jointChain.getJointList()
         
         ids = list(set(_twistJointStartIDs+_tjsIDs))
         
@@ -102,9 +100,9 @@ class BindChain(prb.RiggingBase):
                 
                 #generate the joints and and the constraints between the bind joints
                 
-                self.m_twistChains[i+initialTwistCount].genTwistChain(jntList[ids[i]],jntList[(ids[i])+1],
-                        _numTwistJnts, 
-                        _name = self.addExtToNames(self.removeExtFromNames([jntList[ids[i]]]),"Twist")[0]
+                self.m_twistChains[i+initialTwistCount].genTwistChain(jointList[ids[i]],jointList[(ids[i])+1],
+                        _numTwistJoints, 
+                        _name = self.addExtToNames(self.removeExtFromNames([jointList[ids[i]]]),"Twist")[0]
                         )     
         
         """--------------------"""
@@ -134,16 +132,16 @@ class BindChain(prb.RiggingBase):
             #cycle through each joint chain passed in and check if it's length is the same as the
             #number of joints in the bind chain
             
-            numBindJnts = self.m_jointChain.getNumJnts()
+            numBindJoints = self.m_jointChain.getNumJoints()
             
             numCheck = True
             
-            print "number of bind joints: ", numBindJnts
+            print "number of bind joints: ", numBindJoints
             
             for jointChain in _jointChains:
                 
-                print "number in input joint chain: ", jointChain.getNumJnts()
-                if jointChain.getNumJnts() != numBindJnts:
+                print "number in input joint chain: ", jointChain.getNumJoints()
+                if jointChain.getNumJoints() != numBindJoints:
                     
                     numCheck = False
                     
@@ -156,7 +154,7 @@ class BindChain(prb.RiggingBase):
                 
                 #cycle for each joint in the bind chain
                 
-                for i in range (0,numBindJnts):
+                for i in range (0,numBindJoints):
                     
                     #make a list of the corresponding joints from each chain
                     
@@ -174,7 +172,7 @@ class BindChain(prb.RiggingBase):
 
         """--------------------"""
         
-    def connectJointToJoints(self, _id, _jntList, _constraintList):
+    def connectJointToJoints(self, _id, _jointList, _constraintList):
         
         """
             Method: connectJointToJoints
@@ -184,7 +182,7 @@ class BindChain(prb.RiggingBase):
                 self:                   A pointer to the instance of the BindChain class of which
                                         this method is being called
                 _id:                    The id of the joint to constrain
-                _jntList:               A list of the joints that are to be used to drive the
+                _jointList:               A list of the joints that are to be used to drive the
                                         bind joint
                 _constraintList:        The constraints to put on the joint 
             
@@ -196,13 +194,13 @@ class BindChain(prb.RiggingBase):
         #check if any constraints or joints have been passed into the method and that the id refers to
         #a joint in the joint chain
         
-        if _jntList != 0 and _constraintList != 0 and _id >= 0 and _id < self.m_jointChain.getNumJnts():
+        if _jointList != 0 and _constraintList != 0 and _id >= 0 and _id < self.m_jointChain.getNumJoints():
             
             #cycle through the constraints
             
-            for const in _constraintList:
+            for constraint in _constraintList:
 
-                self.m_constraints.append(self.addConstraint(const, self.m_jointChain.getJoint(_id), _jntList))
+                self.m_constraints.append(self.addConstraint(constraint, self.m_jointChain.getJoint(_id), _jointList))
                 
         
         """--------------------"""

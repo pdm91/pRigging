@@ -49,19 +49,19 @@ class IKChain(prb.RiggingBase):
         
         """--------------------"""
     
-    def genChain(self, _templateJnts, _names, _solver = ""):
+    def genChain(self, _templateJoints, _names, _solver = ""):
         
         """
             Method: genChain
                 a method which generates an FKChain as a duplicate of the input chain,
-                _templateJnts, assigning the names, _names to them  
+                _templateJoints, assigning the names, _names to them  
             
             Inputs:
                 self:                   A pointer to the instance of the FKChain class of which
                                         this method is being called
-                _templateJnts:          A list of the joints in the chain that is used to 
+                _templateJoints:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jntNames:              A list of names for the joints to be called,
+                _jointNames:              A list of names for the joints to be called,
                                         used as a basis for the control names as well,
                                         names are uncompleted, and will be added to as
                                         they get passed down through the object structure
@@ -77,7 +77,7 @@ class IKChain(prb.RiggingBase):
         
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
-        self.m_jointChain.genJoints(_templateJnts, newNames)
+        self.m_jointChain.genJoints(_templateJoints, newNames)
         
         #if the solver is not set default to rp
         
@@ -104,7 +104,7 @@ class IKChain(prb.RiggingBase):
         
         #and the control for it
 
-        self.m_ikControl.genCTRL(self.m_ikHandle)
+        self.m_ikControl.genCtrl(self.m_ikHandle)
         
         #and set it as the parent of the IK handle
         
@@ -119,7 +119,7 @@ class IKChain(prb.RiggingBase):
             
             #add the control
             
-            self.m_ikPVControl.genCTRL(self.m_jointChain.getJoint(1), _name= pvName)
+            self.m_ikPVControl.genCtrl(self.m_jointChain.getJoint(1), _name= pvName)
     
             #offset offsets the group
             
