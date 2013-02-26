@@ -3,10 +3,12 @@
 import pymel.core as pm
 import pRigging.src.jointchain as pjc
 import pRigging.src.riggingbase as prb
+import pRigging.src.jointchaincontainer as pjcc
+
 
 #----------TwistChain-Class----------#
 
-class TwistChain(prb.RiggingBase):    
+class TwistChain(pjcc.JointChainContainer):    
     
     """
         Class: TwistChain
@@ -23,6 +25,7 @@ class TwistChain(prb.RiggingBase):
             pymel.core as pm
             pRigging.src.jointchain as pjc
             pRigging.src.riggingbase as prb
+            pRigging.src.jointchaincontainer as pjcc
 
 
     """
@@ -41,7 +44,6 @@ class TwistChain(prb.RiggingBase):
         
         #set the variables up
         
-        self.m_jointChain = pjc.JointChain()
         self.m_multNode = ""
         
         """--------------------"""
@@ -58,9 +60,8 @@ class TwistChain(prb.RiggingBase):
                         ):
         
         """
-            Method: __init__
-                A method called when the class is instanciated, sets up the attributes
-                for the object
+            Method: genTwistChain
+                A method to generate the twist chain
             
             Inputs:
                 self:                   A pointer to the instance of the object being
@@ -82,6 +83,7 @@ class TwistChain(prb.RiggingBase):
         
         #generate the joint Chain
         
+        self.m_jointChain = pjc.JointChain()
         self.m_jointChain.genFromTopAndBottom(_topJoint,
                                                 _bottomJoint,
                                                 _numJoints,

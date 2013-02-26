@@ -4,10 +4,11 @@ import pymel.core as pm
 import pRigging.src.jointchain as pjc
 import pRigging.src.twistchain as ptc
 import pRigging.src.riggingbase as prb
+import pRigging.src.jointchaincontainer as pjcc
 
 #----------BindChain-Class----------#
 
-class BindChain(prb.RiggingBase):    
+class BindChain(pjcc.JointChainContainer):    
     
     """
         Class: BindChain
@@ -17,7 +18,6 @@ class BindChain(prb.RiggingBase):
         File: pRigging/src/bindchain.py
         
         Contains:
-            self.m_jointChain:      a joint chain
             self.m_constraints:     a List of controls that drive the joints in the joint chain                 
             self.m_twistChains:      a list of TwistChains, typically 1 for the for arm area
         
@@ -26,6 +26,7 @@ class BindChain(prb.RiggingBase):
             pRigging.src.jointchain as pjc
             import pRigging.src.twistchain as ptc
             pRigging.src.riggingbase as prb
+            pRigging.src.jointchaincontainer as pjcc
     """
     
     def __init__(self):
@@ -40,7 +41,6 @@ class BindChain(prb.RiggingBase):
         """
         #initialise the object's attributes
         
-        self.m_jointChain = pjc.JointChain()
         self.m_constraints = []                 
         self.m_twistChains = []
         
@@ -77,7 +77,8 @@ class BindChain(prb.RiggingBase):
         newNames = self.addExtToNames( _names, "Bind")
         
         #generate the joint chain        
-        
+
+        self.m_jointChain = pjc.JointChain()        
         self.m_jointChain.genJoints(_templateJoints, newNames)
         
         #generate the appropriate twistChains
@@ -225,6 +226,21 @@ class BindChain(prb.RiggingBase):
         #takes in a joint chain object and mirrors the chain to generate the chain
         
         pass
+        
+        """--------------------"""
+    
+    def getConstraints(self):
+    
+        """
+            Method: getConstraints
+                a method to return the list of constraints on the bind joints
+                
+            On Exit:        The Constraint List is returned
+            
+        """
+        
+        return self.m_constraints                 
+        
         
         """--------------------"""
         

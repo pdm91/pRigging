@@ -4,10 +4,12 @@ import pymel.core as pm
 import pRigging.src.jointchain as pjc
 import pRigging.src.riggingbase as prb
 import pRigging.src.control as pctrl
+import pRigging.src.jointchaincontainer as pjcc
+
 
 #----------IKChain-Class----------#
 
-class IKChain(prb.RiggingBase):    
+class IKChain(pjcc.JointChainContainer):    
     
     """
         Class: IKChain
@@ -27,6 +29,7 @@ class IKChain(prb.RiggingBase):
             pRigging.src.jointchain as pjc
             pRigging.src.riggingbase as prb
             pRigging.src.control as pctrl
+            pRigging.src.jointchaincontainer as pjcc
     """
     
     def __init__(self):
@@ -49,7 +52,7 @@ class IKChain(prb.RiggingBase):
         
         """--------------------"""
     
-    def genChain(self, _templateJoints, _names, _solver = ""):
+    def genChain(self, _templateJoints, _names, _solver = "", _extOverride = ""):
         
         """
             Method: genChain
@@ -59,24 +62,35 @@ class IKChain(prb.RiggingBase):
             Inputs:
                 self:                   A pointer to the instance of the FKChain class of which
                                         this method is being called
-                _templateJoints:          A list of the joints in the chain that is used to 
+                _templateJoints:        A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jointNames:              A list of names for the joints to be called,
+                _names:                 A list of names for the joints to be called,
                                         used as a basis for the control names as well,
                                         names are uncompleted, and will be added to as
                                         they get passed down through the object structure
                 _solver:                the solver to use
+                _extOverride:           An override for the name extension to be added at 
+                                        this stage 
             
             On Exit:                    The fk chain has been generated, as have the controls,
                                         and they have both been connected together                        
         """
         
-        #add IK extension to the names
+        if _extOverride == "":
+                
+            #add IK extension to the names
+            
+            newNames = self.addExtToNames( _names, "IK")
         
-        newNames = self.addExtToNames( _names, "IK")
+        else:
+            
+            #add the override extension to the names
+            
+            newNames = self.addExtToNames(_names, _extOverride)
         
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
+        self.m_jointChain = pjc.JointChain()
         self.m_jointChain.genJoints(_templateJoints, newNames)
         
         #if the solver is not set default to rp
@@ -162,7 +176,5 @@ class IKChain(prb.RiggingBase):
         pass
         
         """--------------------"""
-        
-
-            
+                    
 #----------END-IKChain-Class----------#  

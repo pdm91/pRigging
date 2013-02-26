@@ -429,5 +429,34 @@ class Control(prb.RiggingBase):
            
         """--------------------"""
         
+    def addAttribute(self,
+                _name,
+                _type,
+                _dv = 0,
+                _max = 1,
+                _min = -1,
+                _setMax = False,
+                _setMin = False):
+        
+        """
+            Method: addAttribute
+                a method to add an attribute to the control
+                
+            Inputs:
+                _name:                  The name of the attribute
+                _type:                  The type of data to be stored
+                _dv:                    The default value, defaults to 0
+                _max:                   The max value, default = 1
+                _min:                   The min value, default = -1
+                _setMax:                Whether or not to set the max value, defaults to False
+                _setMin:                Whether or not to set the min value, defaults to False
+                
+            On Exit:                    The attribute has been created
+            
+        """
+        
+        return self.m_control.addAttr(_name, at = _type, dv = _dv, hxv = _setMax, hnv = _setMin, max = _max, min = _min, k = True)
+                
+        """--------------------"""
         
 #----------END-Control-Class----------#  a

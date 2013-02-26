@@ -4,10 +4,12 @@ import pymel.core as pm
 import pRigging.src.jointchain as pjc
 import pRigging.src.riggingbase as prb
 import pRigging.src.control as pctrl
+import pRigging.src.jointchaincontainer as pjcc
+
 
 #----------FKChain-Class----------#
 
-class FKChain(prb.RiggingBase):    
+class FKChain(pjcc.JointChainContainer):    
     
     """
         Class: FKChain
@@ -26,6 +28,7 @@ class FKChain(prb.RiggingBase):
             pRigging.src.jointchain as pjc
             pRigging.src.riggingbase as prb
             pRigging.src.control as pctrl
+            pRigging.src.jointchaincontainer as pjcc
 
     """
     
@@ -42,12 +45,11 @@ class FKChain(prb.RiggingBase):
         """
         #initialise the object's attributes
         
-        self.m_jointChain = pjc.JointChain()
         self.m_controls = []
         
         """--------------------"""
     
-    def genChain(self, _templateJnts, _names):
+    def genChain(self, _templateJoints, _names, _extOverride = ""):
         
         """
             Method: genChain
@@ -57,28 +59,38 @@ class FKChain(prb.RiggingBase):
             Inputs:
                 self:                   A pointer to the instance of the FKChain class of which
                                         this method is being called
-                _templateJnts:          A list of the joints in the chain that is used to 
+                _templateJoints:          A list of the joints in the chain that is used to 
                                         as the basis for the new joint chain
-                _jointNames:              A list of names for the joints to be called,
+                _names:                 A list of names for the joints to be called,
                                         used as a basis for the control names as well,
                                         names are uncompleted, and will be added to as
                                         they get passed down through the object structure
+                _extOverride:           An override for the name extension to be added at 
+                                        this stage 
             
             On Exit:                    The fk chain has been generated, as have the controls,
                                         and they have both been connected together                        
         """
+        if _extOverride == "":
+                
+            #add FK extension to the names
+            
+            newNames = self.addExtToNames( _names, "FK")
         
-        #add FK extension to the names
-        
-        newNames = self.addExtToNames( _names, "FK")
-        
+        else:
+            
+            #add the override extension to the names
+            
+            newNames = self.addExtToNames(_names, _extOverride)
+            
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
-        self.m_jointChain.genJoints(_templateJnts, newNames)
+        self.m_jointChain = pjc.JointChain()
+        self.m_jointChain.genJoints(_templateJoints, newNames)
         
         #for each joint in the list
         
-        jointList = self.m_jointChain.getJntList()
+        jointList = self.m_jointChain.getJointList()
         
         i = 0
         
@@ -126,7 +138,5 @@ class FKChain(prb.RiggingBase):
         pass
         
         """--------------------"""
-        
-
             
 #----------END-FKChain-Class----------#  
