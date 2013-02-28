@@ -51,27 +51,27 @@ class RiggingBase:
             On Exit:                    The extensions have been added to the name strings                      
         """
         
-        returnList = []
+        returnList = _names[:]
         
         #early breakout if no extension is supplied
 
         if _ext == "":
             
-            return _names
+            return returnList
             
         for i in range (0, (len(_names))):
             
             #if neither the end of the name nor the start of the extension is an underscore
             
-            if _names[i][-1] != "_" and _ext[0] != "_":
+            if returnList[i][-1] != "_" and _ext[0] != "_":
                 
                 #add an underscore to the end of the name
                 
-                _names[i] = _names[i] + "_"
+                returnList[i] = returnList[i] + "_"
             
             #if both have one
                 
-            if _names[i][-1] == "_" and _ext[0] == "_":
+            if returnList[i][-1] == "_" and _ext[0] == "_":
                 
                 #remove the underscore from the start of the extension
                 
@@ -79,8 +79,8 @@ class RiggingBase:
                 
             #add the extension to the name
             
-            returnList.append( _names[i] + _ext)
-            
+            returnList[i] = returnList[i]+_ext
+                            
             #and then remove any long,name path influence from the name
             
             index =  returnList[i].rfind("|")
@@ -115,7 +115,7 @@ class RiggingBase:
             
         for i in range (0, (len(_names))):
             
-            returnList = _names
+            returnList = _names [:]
             
             #find the last _ in the name
             
@@ -140,8 +140,6 @@ class RiggingBase:
                 #set the new name to be the old name except what was after the undercore
                 
                 returnList[i] = returnList[i][index:]
-                
-        print returnList
 
         return returnList
         

@@ -43,6 +43,11 @@ class FKChain(pjcc.JointChainContainer):
                 self:                   A pointer to the instance of the object being
                                         created.
         """
+        
+        #initialise the super class
+        
+        pjcc.JointChainContainer.__init__(self)
+        
         #initialise the object's attributes
         
         self.m_controls = []
@@ -71,17 +76,25 @@ class FKChain(pjcc.JointChainContainer):
             On Exit:                    The fk chain has been generated, as have the controls,
                                         and they have both been connected together                        
         """
+        
+        newNames = _names[:]
+        groupName = _names[0]
+        
         if _extOverride == "":
                 
             #add FK extension to the names
             
-            newNames = self.addExtToNames( _names, "FK")
+            newNames = self.addExtToNames( newNames, "FK")
+            
+            print newNames, "lookatme2"
+            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),"FK")[0]
         
         else:
             
             #add the override extension to the names
             
-            newNames = self.addExtToNames(_names, _extOverride)
+            newNames = self.addExtToNames(newNames, _extOverride)
+            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),_extOverride)[0]
             
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
@@ -111,6 +124,8 @@ class FKChain(pjcc.JointChainContainer):
             
             self.m_controls[i].setCtrlParent(self.m_controls[i-1].getCtrl())
             
+        self.addGroupOverChain(groupName)   
+            
         pm.select(cl = True)
         
         
@@ -138,5 +153,85 @@ class FKChain(pjcc.JointChainContainer):
         pass
         
         """--------------------"""
+        
+    def addGroupOverChain(self, _name, _gExtOverride = "", _gExt = "", _addExt = True):
+        
+        """
+            Method: addGroupOverChain
+                a method to add a group over the chain
+                
+            Inputs:
+                _name:                  The name of the group
+                _gExtOverride:          An override of the extension for the group name,
+                                        defaults to an empty string
+                _gExt:                  Short name for _gExtOverride
+                _addExt:                A boolean defining whether or not to add an extension
+                                        to the group name, defaults to False
+                                        
+            On Exit:                    The group has been made and all of the objects in the
+                                        chain have been parented under it
+        """        
+        
+        #set up the name value
+        
+        name = _name
+        
+        #if the addExt boolean is set
+        
+        if (_addExt):
             
+            #set the extension string to be the default
+            
+            ext = "GRP"
+            
+            #if either of the name inputs are set, make the extension the input,
+            #_gExtOverride takes precidence over _gExt
+            
+            if _gExtOverride != "":
+                
+                ext = _gExtOverride
+                
+            elif _gExt != "":
+                
+                ext = _gExt
+                
+            #add the extension to the name
+            
+            name = self.addExtToNames([name],ext)[0]
+            
+        #check if there is currently a top group
+        
+        if len(self.m_chainGroups) != 0:
+            
+            #ensure clear selection
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_chainGroups[0].setParent(newGroup)
+            self.m_chainGroups.insert(0,newgroup)
+            
+        #if there arent any groups
+        
+        else:
+            
+            #generate the group and set it as the parent of all of the hierarchies 
+            #represented within the chain container
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_jointChain.getJoint(0).setParent(newGroup)
+            self.m_controls[0].getTopGrp().setParent(newGroup)
+            self.m_chainGroups.append(newGroup)    
+
+        
+        """--------------------"""    
+
 #----------END-FKChain-Class----------#  

@@ -15,6 +15,11 @@ class JointChainContainer(prb.RiggingBase):
         
         Contains:
             self.m_jointChain:      A joint chain
+            self.m_chainGroups:     A group under which all of the
+                                    chain is grouped, the rig is put
+                                    constrained together so these groups
+                                    will be parented under the rig's global
+                                    move control.  
         
         Imports:
             pymel.core as pm
@@ -36,6 +41,7 @@ class JointChainContainer(prb.RiggingBase):
         #initialise the object's attributes
         
         self.m_jointChain = 0
+        self.m_chainGroups = []
 
         """--------------------"""
 
@@ -61,6 +67,18 @@ class JointChainContainer(prb.RiggingBase):
         
         return self.m_jointChain.getJoint(_id)
 
+        """--------------------"""
+        
+    def getChainGroup(self):
+        
+        """
+            Method: getChainGroup
+                a method to return the chainGroup
+                
+        """
+        
+        return self.m_chainGroups[0]
+        
         """--------------------"""
             
 #----------END-JointChainContainer-Class----------#  

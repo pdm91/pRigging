@@ -43,9 +43,13 @@ class IKChain(pjcc.JointChainContainer):
                 self:                   A pointer to the instance of the object being
                                         created.
         """
+        
+        #initialise the super class
+        
+        pjcc.JointChainContainer.__init__(self)
+        
         #initialise the object's attributes
         
-        self.m_jointChain = pjc.JointChain()
         self.m_ikHandle = ""
         self.m_ikControl = pctrl.Control()
         self.m_ikPVControl = pctrl.Control()
@@ -75,19 +79,26 @@ class IKChain(pjcc.JointChainContainer):
             On Exit:                    The fk chain has been generated, as have the controls,
                                         and they have both been connected together                        
         """
+        #initialise variables
+        
+        newNames = _names[:]
+        groupName = _names[0]
         
         if _extOverride == "":
-                
+
             #add IK extension to the names
             
-            newNames = self.addExtToNames( _names, "IK")
+            newNames = self.addExtToNames( newNames, "IK")
+            print _names, "LOOKATME"
+            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),"IK")[0]
         
         else:
             
             #add the override extension to the names
             
-            newNames = self.addExtToNames(_names, _extOverride)
-        
+            newNames = self.addExtToNames(newNames, _extOverride)
+            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),_extOverride)[0]
+                
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
         self.m_jointChain = pjc.JointChain()
@@ -106,7 +117,7 @@ class IKChain(pjcc.JointChainContainer):
             
         #generate a name based on the root joint name
         
-        handleName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([_names[0]])), "IK"), "HNDL")[0]
+        handleName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), "IK"), "HNDL")[0]
            
         #then generate an IK handle
                 
@@ -129,7 +140,7 @@ class IKChain(pjcc.JointChainContainer):
             #make a pole vector control
             #set the name for the control
             
-            pvName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([_names[0]])), "IK"), "PV")[0]
+            pvName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), "IK"), "PV")[0]
             
             #add the control
             
@@ -145,8 +156,11 @@ class IKChain(pjcc.JointChainContainer):
             
             self.m_ikPVControl.setCtrlParent(self.m_ikControl.getCtrl())
             
-            self.m_ikPVControl.getTopGrp().setRotation((0,0,0), space = "world")            
+            self.m_ikPVControl.getTopGrp().setRotation((0,0,0), space = "world")    
+            
+        #add the top group to the chain and controls
         
+        self.addGroupOverChain( groupName)
             
         pm.select(cl = True)
         
@@ -176,5 +190,82 @@ class IKChain(pjcc.JointChainContainer):
         pass
         
         """--------------------"""
+        
+    def addGroupOverChain(self, _name, _gExtOverride = "", _gExt = "", _addExt = True):
+        
+        """
+            Method: addGroupOverChain
+                a method to add a group over the chain
+                
+            Inputs:
+                _name:                  The name of the group
+                _gExtOverride:          An override of the extension for the group name,
+                                        defaults to an empty string
+                _gExt:                  Short name for _gExtOverride
+                _addExt:                A boolean defining whether or not to add an extension
+                                        to the group name, defaults to False
+                                        
+            On Exit:                    The group has been made and all of the objects in the
+                                        chain have been parented under it
+        """        
+        
+        #set up the name value
+        
+        name = _name
+        
+        #if the addExt boolean is set
+        
+        if (_addExt):
+            
+            #set the extension string to be the default
+            
+            ext = "GRP"
+            
+            #if either of the name inputs are set, make the extension the input,
+            #_gExtOverride takes precidence over _gExt
+            
+            if _gExtOverride != "":
+                
+                ext = _gExtOverride
+                
+            elif _gExt != "":
+                
+                ext = _gExt
+                
+            #add the extension to the name
+            
+            name = self.addExtToNames([name],ext)[0]
+            
+        #check if there is currently a top group
+        
+        if len(self.m_chainGroups) != 0:
+            
+            #ensure clear selection
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_chainGroups[0].setParent(newGroup)
+            self.m_chainGroups.insert(0,newgroup)
+            
+        #if there arent any groups
+        
+        else:
+            
+            #generate the group and set it as the parent of all of the hierarchies 
+            #represented within the chain container
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_jointChain.getJoint(0).setParent(newGroup)
+            self.m_ikControl.getTopGrp().setParent(newGroup)
+            self.m_chainGroups.append(newGroup)   
                     
 #----------END-IKChain-Class----------#  

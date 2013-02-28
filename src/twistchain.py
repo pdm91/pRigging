@@ -42,6 +42,10 @@ class TwistChain(pjcc.JointChainContainer):
                                         created.
         """
         
+        #initialise the super class
+        
+        pjcc.JointChainContainer.__init__(self)
+        
         #set the variables up
         
         self.m_multNode = ""

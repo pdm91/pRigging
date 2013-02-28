@@ -60,6 +60,7 @@ class ArmRig(prb.RiggingBase):
         self.m_bindChain = 0
         self.m_FKIKControl = 0
         self.m_reverseNode = ""
+        self.m_topGroup = ""
         
         """--------------------"""
         
@@ -93,7 +94,7 @@ class ArmRig(prb.RiggingBase):
         
         #set the m_template joints equal to those passed in with hierarch enforced
         
-        self.m_templateJoints = enforceHierarchy(_templateJoints):
+        self.m_templateJoints = self.enforceHierarchy(_templateJoints)
         
         #get the number of joints inputted
         
@@ -102,6 +103,8 @@ class ArmRig(prb.RiggingBase):
         #make a list of names based on the number of joints
         
         names = []
+        
+        groupName = self.addExtToNames([_name],"GRP")[0]
         
         if numJoints >= 1:
             
@@ -150,14 +153,14 @@ class ArmRig(prb.RiggingBase):
             self.m_ikChain = pic.IKChain()
             
             self.m_ikChain.genChain(self.m_templateJoints, names, _extOverride = extOver)
-            
+            print names, " AFTER IK "
             
         if _doFK:
             
             #generate the FK Chain
             
             self.m_fkChain = pfc.FKChain()
-            
+            print names, " BEFORE FK "
             self.m_fkChain.genChain( self.m_templateJoints, names, _extOverride = extOver)
             
         if _doFK and _doIK:
@@ -165,7 +168,7 @@ class ArmRig(prb.RiggingBase):
             #generate the bind chain
             
             self.m_bindChain = pbc.BindChain()
-            
+            print names, " BEFORE BIND "
             if not _doTwist:
                 
                 self.m_bindChain.genChain(self.m_templateJoints, names)
@@ -230,6 +233,29 @@ class ArmRig(prb.RiggingBase):
                 self.m_FKIKControl.getCtrl().FKIK_Switch.connect(weights[0])
                 self.m_reverseNode.output1D.connect(weights[1])
                     
+        #make the group
+        
+        pm.select(cl = True)
+        self.m_topGroup = pm.group(n = groupName)
+        
+        #if the various chains exist, parent their top group to the group
+        
+        if self.m_fkChain != 0:
+            
+            self.m_fkChain.getChainGroup().setParent(self.m_topGroup)
+        
+        if self.m_ikChain != 0:
+            
+            self.m_ikChain.getChainGroup().setParent(self.m_topGroup)
+        
+        if self.m_bindChain != 0:
+            
+            self.m_bindChain.getChainGroup().setParent(self.m_topGroup)
+            
+        #clear the selection
+        
+        pm.select(cl = True)
+        
         """--------------------"""
         
     def genFromMirror(self, _mirrorChain):
@@ -256,13 +282,14 @@ class ArmRig(prb.RiggingBase):
         """--------------------"""
         
 #----------END-ArmRig-Class----------#  
-reload(pic.pjcc)
-reload(pfc.pjcc)
-reload(pfc.pjcc)
+reload(pic)
+reload(pfc)
+reload(pfc)
 reload(pbc)
+
 reload(pctrl)
 test = ArmRig()
-test.genArmRig(pm.ls(sl = True),"Char_L_Arm", 
+test.genArmRig(pm.ls(sl = True),"Char_R_Arm", 
                     _doIK = True, 
                     _doFK = True, 
                     _doTwist = True, 

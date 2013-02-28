@@ -39,6 +39,11 @@ class BindChain(pjcc.JointChainContainer):
                 self:                   A pointer to the instance of the object being
                                         created.
         """
+        
+        #initialise the super class
+        
+        pjcc.JointChainContainer.__init__(self)
+        
         #initialise the object's attributes
         
         self.m_constraints = []                 
@@ -73,8 +78,10 @@ class BindChain(pjcc.JointChainContainer):
         """
         
         #generate the names for the joints
-        
+
         newNames = self.addExtToNames( _names, "Bind")
+
+        groupName = self.addExtToNames( self.removeExtFromNames([_names[0]]), "Bind")[0]
         
         #generate the joint chain        
 
@@ -104,7 +111,9 @@ class BindChain(pjcc.JointChainContainer):
                 self.m_twistChains[i+initialTwistCount].genTwistChain(jointList[ids[i]],jointList[(ids[i])+1],
                         _numTwistJoints, 
                         _name = self.addExtToNames(self.removeExtFromNames([jointList[ids[i]]]),"Twist")[0]
-                        )     
+                        ) 
+                        
+        self.addGroupOverChain(groupName)   
         
         """--------------------"""
         
@@ -244,4 +253,82 @@ class BindChain(pjcc.JointChainContainer):
         
         """--------------------"""
         
+    def addGroupOverChain(self, _name, _gExtOverride = "", _gExt = "", _addExt = True):
+        
+        """
+            Method: addGroupOverChain
+                a method to add a group over the chain
+                
+            Inputs:
+                _name:                  The name of the group
+                _gExtOverride:          An override of the extension for the group name,
+                                        defaults to an empty string
+                _gExt:                  Short name for _gExtOverride
+                _addExt:                A boolean defining whether or not to add an extension
+                                        to the group name, defaults to False
+                                        
+            On Exit:                    The group has been made and all of the objects in the
+                                        chain have been parented under it
+        """        
+        
+        #set up the name value
+        
+        name = _name
+        
+        #if the addExt boolean is set
+        
+        if (_addExt):
+            
+            #set the extension string to be the default
+            
+            ext = "GRP"
+            
+            #if either of the name inputs are set, make the extension the input,
+            #_gExtOverride takes precidence over _gExt
+            
+            if _gExtOverride != "":
+                
+                ext = _gExtOverride
+                
+            elif _gExt != "":
+                
+                ext = _gExt
+                
+            #add the extension to the name
+            
+            name = self.addExtToNames([name],ext)[0]
+            
+        #check if there is currently a top group
+        
+        if len(self.m_chainGroups) != 0:
+            
+            #ensure clear selection
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_chainGroups[0].setParent(newGroup)
+            self.m_chainGroups.insert(0,newgroup)
+            
+        #if there arent any groups
+        
+        else:
+            
+            #generate the group and set it as the parent of all of the hierarchies 
+            #represented within the chain container
+            
+            pm.select(cl = True)
+            
+            #greate a group over that one and insert it into the top of the list
+            #after setting the parent
+            
+            newGroup = pm.group(n = name)
+            self.m_jointChain.getJoint(0).setParent(newGroup)
+            self.m_chainGroups.append(newGroup) 
+            
+        """--------------------"""
+          
 #----------END-BindChain-Class----------#  

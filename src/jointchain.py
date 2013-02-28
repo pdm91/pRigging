@@ -72,7 +72,7 @@ class JointChain(prb.RiggingBase):
         numTemplateJoints = len(_templateJoints)
         numNames =  len(_jointNames)
         
-
+        newNames = _jointNames
         
         #if not return error string
         
@@ -86,7 +86,7 @@ class JointChain(prb.RiggingBase):
 
             #add the extension to the names
             
-            newNames = self.addExtToNames(_jointNames, self.m_ext)
+            newNames = self.addExtToNames(newNames, self.m_ext)
             
             #make sure the selection is clear
             
@@ -367,7 +367,7 @@ class JointChain(prb.RiggingBase):
     def getJoint(self, _id):
         
         """
-            Method: getTopJoint
+            Method: getJoint
                 a method which returns the specified joint in the joint chain hierarchy.
                 
             On Exit:                    returns the top joint in the joint chain hierarchy
