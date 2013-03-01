@@ -3,7 +3,9 @@
 import pymel.core as pm
 import os
 import pRigging.src.riggingbase as prb
-import pRigging.src.ui.starttabnovice as pstt
+import pRigging.src.ui.starttabnovice as pstn
+import pRigging.src.ui.armtabnovice as patn
+import prigging.src.armrig as par
 
 #----------GUI-Class----------#
 
@@ -58,6 +60,10 @@ class Gui (prb.RiggingBase):
         #tabList
         
         self.m_tabList = []
+        
+        #rig components
+        
+        self.m_rigComponents = []
         
         #first startup boolean
         
@@ -152,7 +158,7 @@ class Gui (prb.RiggingBase):
             
             #create the initial tab
             
-            self.m_tabList.append(pstt.StartTabNovice(self.m_tabs,self,"General"))
+            self.m_tabList.append(pstn.StartTabNovice(self.m_tabs,self,"General"))
         
         #attach the tabs and the radio buttons to the form layout
         
@@ -234,7 +240,15 @@ class Gui (prb.RiggingBase):
             
             name = self.addExtToNames([self.m_tabList[0].getRigName()],side)[0]
             
-            print name
+            #make an arm rig and add it to the rig components
+            
+            arm = par.ArmRig(name)
+            self.m_rigComponents.append(arm)
+            
+            self.m_tabList.append(patn.ArmTabNovice(self.m_tabs,self,"Arm", arm))            
+
+            
+            
             
 def lrPrompt():
     """
