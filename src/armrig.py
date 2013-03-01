@@ -40,7 +40,7 @@ class ArmRig(prb.RiggingBase):
 
     """
     
-    def __init__(self):
+    def __init__(self, _name):
         
         """
             Method: __init__
@@ -62,11 +62,14 @@ class ArmRig(prb.RiggingBase):
         self.m_reverseNode = ""
         self.m_topGroup = ""
         
+        #the root name of the rig
+        
+        self.m_rootName = _name
+        
         """--------------------"""
         
     def genArmRig(self, 
-                    _templateJoints, 
-                    _name, 
+                    _templateJoints,
                     _doIK = True, 
                     _doFK = True, 
                     _doTwist = True, 
@@ -104,25 +107,25 @@ class ArmRig(prb.RiggingBase):
         
         names = []
         
-        groupName = self.addExtToNames([_name],"GRP")[0]
+        groupName = self.addExtToNames([self.m_rootName],"GRP")[0]
         
         if numJoints >= 1:
             
             #if there is at least 1 joint
             
-            names.append(self.addExtToNames([_name], "Shoulder")[0])
+            names.append(self.addExtToNames([self.m_rootName], "Shoulder")[0])
             
         if numJoints >= 2:
             
             #if there are at least 2 joints
             
-            names.append(self.addExtToNames([_name], "Wrist")[0])
+            names.append(self.addExtToNames([self.m_rootName], "Wrist")[0])
             
         if numJoints == 3:
             
             #if there are exactly three joints
             
-            names.insert(-1, self.addExtToNames([_name], "Elbow")[0])
+            names.insert(-1, self.addExtToNames([self.m_rootName], "Elbow")[0])
             
         elif numJoints > 3:
             
@@ -282,15 +285,4 @@ class ArmRig(prb.RiggingBase):
         """--------------------"""
         
 #----------END-ArmRig-Class----------#  
-reload(pic)
-reload(pfc)
-reload(pfc)
-reload(pbc)
 
-reload(pctrl)
-test = ArmRig()
-test.genArmRig(pm.ls(sl = True),"Char_R_Arm", 
-                    _doIK = True, 
-                    _doFK = True, 
-                    _doTwist = True, 
-                    _twistStartIds = [-2])

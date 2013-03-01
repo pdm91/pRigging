@@ -2,10 +2,12 @@
 
 import pymel.core as pm
 import os
+import pRigging.src.riggingbase as prb
+import pRigging.src.ui.starttabnovice as pstt
 
 #----------GUI-Class----------#
 
-class Gui:
+class Gui (prb.RiggingBase):
     
     """
         Class: Gui
@@ -52,6 +54,10 @@ class Gui:
         #name for the window
         
         self.m_windowName = "pRiggingWindow"
+        
+        #tabList
+        
+        self.m_tabList = []
         
         #first startup boolean
         
@@ -140,9 +146,13 @@ class Gui:
             
             self.m_firstStartup = False
             
-        #create the tab layout
-               
-        self.m_tabs = pm.tabLayout(innerMarginWidth=5, innerMarginHeight=5)
+            #create the tab layout
+                   
+            self.m_tabs = pm.tabLayout(innerMarginWidth=5, innerMarginHeight=5)
+            
+            #create the initial tab
+            
+            self.m_tabList.append(pstt.StartTabNovice(self.m_tabs,self,"General"))
         
         #attach the tabs and the radio buttons to the form layout
         
@@ -157,35 +167,7 @@ class Gui:
         self.m_outerForm.attachPosition(self.m_userSkillRB, 'right',0,50)
                                        
         self.m_outerForm.attachNone(self.m_userSkillRB, 'bottom')
-        
-        
-        #set up the contents for the first tab
-        #------------TEMPORARY CONTENT------------#
-        
-        self.child1 = pm.rowColumnLayout(numberOfColumns=1)
-        pm.button()
-        if _skillLevel == 'Novice':
-            pm.button()
-            pm.button()
-        pm.setParent( '..' )
-        
-        #set up the contents for the second tab 
-        
-        self.child2 = pm.rowColumnLayout(numberOfColumns=1)
-        pm.button()
-        pm.button()
-        pm.button()
-        pm.setParent( '..' )
-        
-        #attach the tab contents to the tab
-        
-        pm.tabLayout(self.m_tabs, edit = True, tabLabel = ((self.child1, 'one'),(self.child2, 'Two')) )
-        
-        #self.m_tabs.setTabLabel(self.child1, 'one')
-        #self.m_tabs.setTabLabel(self.child2, 'Two')
-        
-        #------------TEMPORARY CONTENT------------#
-            
+                    
         #show window 
         
         pm.showWindow(self.m_window)
@@ -216,7 +198,7 @@ class Gui:
             #set the skill level
         
             self.m_skillLevel = _newLevel
-            pm.deleteUI(self.m_tabs)
+            #pm.deleteUI(self.m_tabs)
             self.genGui(self.m_skillLevel)
             
             #save the file to the maya prefs folder
@@ -226,5 +208,75 @@ class Gui:
             f.close()
         
         """--------------------"""
+        
+    def addTab(self, _type):
+        
+        """
+            Method: addTab
+                a method to add a tab
+                
+            Inputs:
+                _type:                A string identifyinfg the type of tab to add
+                
+            On Exit:                  A tab has been added
+            
+        """
+        
+        #switch throught the different options
+        
+        if _type == "arm":
+            
+            #create a button prompt
+            
+            side = pm.layoutDialog(t = "Pick Sides", ui = lrPrompt)
+            
+            print side
+            
+def lrPrompt():
+    """
+        Method: lrPrompt
+            A procedure defining a layout prompt, global because it
+            breaks if it's in a class
+            
+        On Exit:            Returns a string defining the choice
+                            of the user, left right or centre
+    """
+    # Get the dialog's formLayout.
+    
+    form = pm.setParent(q=True)
+
+    #set size
+    
+    pm.formLayout(form, e=True, width=300)
+
+    #set the text for the window
+
+    t = pm.text(l='What side do you want to start working on?')
+    
+    #buttons
+
+    b1 = pm.button(l='Left', c='pm.layoutDialog( dismiss="L" )' )
+    b2 = pm.button(l='Centre', c='pm.layoutDialog( dismiss="C" )' )
+    b3 = pm.button(l='Right', c='pm.layoutDialog( dismiss="R" )' )
+
+    #set up the positioning of the elements
+
+    form.attachForm(t, 'top', 5)
+    form.attachForm(t, 'left', 5)
+    form.attachForm(t, 'right', 5)
+    form.attachForm(b1, 'left', 5)
+    form.attachForm(b3, 'right', 5)
+    form.attachControl(b1, 'top', 5, t)
+    form.attachControl(b2, 'top', 5, t)
+    form.attachControl(b3, 'top', 5, t)
+    form.attachPosition(b1, 'right', 5, 33)
+    form.attachPosition(b2, 'left', 5, 33)
+    form.attachPosition(b2, 'right', 5, 66)
+    form.attachPosition(b3, 'left', 5, 66)
+
+
+    
 
 #----------END-GUI-Class----------#       
+
+gui = Gui()
