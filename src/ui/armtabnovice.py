@@ -99,7 +99,7 @@ class ArmTabNovice(prb.RiggingBase):
                                     fn = "smallBoldLabelFont",
                                     ww = True)
         
-        self.m_addLegButton = pm.button(l = "Add Leg",c= pm.Callback(self.m_gui.addTab, "leg"))
+        self.m_closeButton = pm.button(l = "Close Tab")
         
         #attach the first text to the form
         
@@ -122,14 +122,17 @@ class ArmTabNovice(prb.RiggingBase):
         
         self.m_topLayout.attachControl(self.m_jointToolButton, 'top', 20, self.m_note1Text)
         
-        self.m_topLayout.attachForm(self.m_step2Label, 'left', 30)
-        self.m_topLayout.attachPosition(self.m_step2Label, 'right', 5,50)        
+        self.m_topLayout.attachForm(self.m_step2Label, 'left', 30)       
         self.m_topLayout.attachControl(self.m_step2Label, 'top', 20, self.m_jointToolButton)
+
+        self.m_topLayout.attachPosition(self.m_step2Text, 'right', 5, 50)       
+        self.m_topLayout.attachControl(self.m_step2Text, 'top', 20, self.m_jointToolButton)
+        self.m_topLayout.attachControl(self.m_step2Text, 'left', 20, self.m_step2Label)
+                
+        self.m_topLayout.attachForm(self.m_closeButton, 'left', 20)
+        self.m_topLayout.attachForm(self.m_closeButton, 'right', 20)
+        self.m_topLayout.attachForm(self.m_closeButton, 'bottom', 20)
         
-        self.m_topLayout.attachForm(self.m_addLegButton, 'left', 30)
-        self.m_topLayout.attachForm(self.m_addLegButton, 'right', 20)
-        
-        self.m_topLayout.attachControl(self.m_addLegButton, 'top', 20, self.m_addArmButton)
         
                                      
 
