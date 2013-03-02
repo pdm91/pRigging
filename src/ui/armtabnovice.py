@@ -78,6 +78,8 @@ class ArmTabNovice(prb.RiggingBase):
         
         #add text
         
+        #-------------step 1 text generate-------------#
+        
         self.m_step1Label = pm.text(label="Step 1:", fn = "boldLabelFont")
         self.m_step1Text = pm.text(label = "Build the template joint chain for your arm", 
                                     ann = "At this point, I can't really help, you need to at least know where you want the joints",
@@ -91,7 +93,11 @@ class ArmTabNovice(prb.RiggingBase):
                                     fn = "smallPlainLabelFont",
                                     ww = True)
         
+        #-------------step 1 control generate-------------#
+        
         self.m_jointToolButton = pm.button(l = "Joint Tool")
+        
+        #-------------step 2 text generate-------------#
         
         self.m_step2Label = pm.text(label="Step 2:", fn = "boldLabelFont")
         self.m_step2Text = pm.text(label = "Select the joints and load them into the box below", 
@@ -100,21 +106,35 @@ class ArmTabNovice(prb.RiggingBase):
                                     fn = "smallBoldLabelFont",
                                     h = 20,
                                     ww = True)
-                                    
+        
+        #-------------step 3 text generate-------------#
+                
         self.m_step3Label = pm.text(label="Step 3:", fn = "boldLabelFont")
         self.m_step3Text = pm.text(label = "Select the options and Generate", 
                                     al = "left",
                                     fn = "smallBoldLabelFont",
                                     h = 20,
                                     ww = True)
+                                    
+        #-------------step 2 control generate-------------#
         
+        self.m_jointTable = pm.textScrollList()
         self.m_loadJointsButton = pm.button(l = "Load Joints")
+        
+        #-------------step 3 control generate-------------#
+        
+        self.m_ikCheck = pm.checkBox(l = "IK", ann = "Generate an IK chain?", v = True)
+        self.m_fkCheck = pm.checkBox(l = "FK", ann = "Generate an FK chain?", v = True)
+        self.m_twistCheck = pm.checkBox(l = "Forearm Twist", ann = "Add a forearm twist chain?", v = True)        
         
         self.m_genJointsButton = pm.button(l = "Generate Joints")
         
+        #-------------misc control generate-------------#
+        
         self.m_closeButton = pm.button(l = "Close Tab")
         
-        #attach the first text to the form
+
+        #-------------step 1 text attach-------------#
         
         self.m_topLayout.attachForm(self.m_step1Label, 'left', 20)
         self.m_topLayout.attachForm(self.m_step1Text, 'right', 20)
@@ -130,10 +150,14 @@ class ArmTabNovice(prb.RiggingBase):
         
         self.m_topLayout.attachPosition(self.m_note1Text, 'bottom', 5, 20)
         
+        #-------------step 1 controls attach-------------#
+        
         self.m_topLayout.attachForm(self.m_jointToolButton, 'left', 30)
         self.m_topLayout.attachForm(self.m_jointToolButton, 'right', 20)
         
         self.m_topLayout.attachControl(self.m_jointToolButton, 'top', 20, self.m_note1Text)
+        
+        #-------------step 2 text attach-------------#
         
         self.m_topLayout.attachForm(self.m_step2Label, 'left', 20)       
         self.m_topLayout.attachControl(self.m_step2Label, 'top', 20, self.m_jointToolButton)
@@ -142,20 +166,46 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_topLayout.attachControl(self.m_step2Text, 'top', 20, self.m_jointToolButton)
         self.m_topLayout.attachControl(self.m_step2Text, 'left', 20, self.m_step2Label)
         
-        self.m_topLayout.attachPosition(self.m_step3Label, 'left', 10,50)       
+        #-------------step 3 text attach-------------#
+        
+        self.m_topLayout.attachPosition(self.m_step3Label, 'left', 20,50)       
         self.m_topLayout.attachControl(self.m_step3Label, 'top', 20, self.m_jointToolButton)
 
         self.m_topLayout.attachForm(self.m_step3Text, 'right', 20)       
         self.m_topLayout.attachControl(self.m_step3Text, 'top', 20, self.m_jointToolButton)
         self.m_topLayout.attachControl(self.m_step3Text, 'left', 20, self.m_step3Label)
         
+        
+        #-------------step 2 control attach-------------#
+        
+        self.m_topLayout.attachForm(self.m_jointTable, 'left', 30)
+        self.m_topLayout.attachPosition(self.m_jointTable, 'right', 20, 50)
+        self.m_topLayout.attachControl(self.m_jointTable,'top', 20, self.m_step2Text)
+        self.m_topLayout.attachControl(self.m_jointTable,'bottom', 20, self.m_loadJointsButton)
+                
         self.m_topLayout.attachForm(self.m_loadJointsButton, 'left', 20)
-        self.m_topLayout.attachControl(self.m_loadJointsButton, 'right', 10, self.m_genJointsButton)
+        self.m_topLayout.attachControl(self.m_loadJointsButton, 'right', 20, self.m_genJointsButton)
         self.m_topLayout.attachControl(self.m_loadJointsButton, 'bottom', 20,self.m_closeButton)
         
+        #-------------step 3 control attach-------------#
+        
+        self.m_topLayout.attachForm(self.m_ikCheck, 'right',20)
+        self.m_topLayout.attachForm(self.m_fkCheck, 'right',20)
+        self.m_topLayout.attachForm(self.m_twistCheck, 'right',20)
+        
+        self.m_topLayout.attachPosition(self.m_ikCheck, 'left' , 40 , 50)
+        self.m_topLayout.attachPosition(self.m_fkCheck, 'left' , 40 , 50)
+        self.m_topLayout.attachPosition(self.m_twistCheck, 'left' , 40 , 50)
+        
+        self.m_topLayout.attachControl(self.m_ikCheck, 'top', 10, self.m_step3Text)
+        self.m_topLayout.attachControl(self.m_fkCheck, 'top', 10, self.m_ikCheck)
+        self.m_topLayout.attachControl(self.m_twistCheck, 'top', 10, self.m_fkCheck)
+        
         self.m_topLayout.attachForm(self.m_genJointsButton, 'right', 20)
-        self.m_topLayout.attachPosition(self.m_genJointsButton, 'left', 10, 50)
+        self.m_topLayout.attachPosition(self.m_genJointsButton, 'left', 20, 50)
         self.m_topLayout.attachControl(self.m_genJointsButton, 'bottom', 20,self.m_closeButton)
+                
+        #-------------misc control attach-------------#
                 
         self.m_topLayout.attachForm(self.m_closeButton, 'left', 20)
         self.m_topLayout.attachForm(self.m_closeButton, 'right', 20)
