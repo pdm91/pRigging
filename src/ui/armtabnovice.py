@@ -127,7 +127,7 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_fkCheck = pm.checkBox(l = "FK", ann = "Generate an FK chain?", v = True)
         self.m_twistCheck = pm.checkBox(l = "Forearm Twist", ann = "Add a forearm twist chain?", v = True)        
         
-        self.m_genJointsButton = pm.button(l = "Generate Joints")
+        self.m_genRigButton = pm.button(l = "Generate Rig")
         
         #-------------misc control generate-------------#
         
@@ -163,7 +163,7 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_topLayout.attachControl(self.m_step2Label, 'top', 20, self.m_jointToolButton)
 
         self.m_topLayout.attachPosition(self.m_step2Text, 'right', 5, 50)       
-        self.m_topLayout.attachControl(self.m_step2Text, 'top', 20, self.m_jointToolButton)
+        self.m_topLayout.attachControl(self.m_step2Text, 'top', 17, self.m_jointToolButton)
         self.m_topLayout.attachControl(self.m_step2Text, 'left', 20, self.m_step2Label)
         
         #-------------step 3 text attach-------------#
@@ -172,7 +172,7 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_topLayout.attachControl(self.m_step3Label, 'top', 20, self.m_jointToolButton)
 
         self.m_topLayout.attachForm(self.m_step3Text, 'right', 20)       
-        self.m_topLayout.attachControl(self.m_step3Text, 'top', 20, self.m_jointToolButton)
+        self.m_topLayout.attachControl(self.m_step3Text, 'top', 17, self.m_jointToolButton)
         self.m_topLayout.attachControl(self.m_step3Text, 'left', 20, self.m_step3Label)
         
         
@@ -184,7 +184,7 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_topLayout.attachControl(self.m_jointTable,'bottom', 20, self.m_loadJointsButton)
                 
         self.m_topLayout.attachForm(self.m_loadJointsButton, 'left', 20)
-        self.m_topLayout.attachControl(self.m_loadJointsButton, 'right', 20, self.m_genJointsButton)
+        self.m_topLayout.attachControl(self.m_loadJointsButton, 'right', 20, self.m_genRigButton)
         self.m_topLayout.attachControl(self.m_loadJointsButton, 'bottom', 20,self.m_closeButton)
         
         #-------------step 3 control attach-------------#
@@ -201,9 +201,9 @@ class ArmTabNovice(prb.RiggingBase):
         self.m_topLayout.attachControl(self.m_fkCheck, 'top', 10, self.m_ikCheck)
         self.m_topLayout.attachControl(self.m_twistCheck, 'top', 10, self.m_fkCheck)
         
-        self.m_topLayout.attachForm(self.m_genJointsButton, 'right', 20)
-        self.m_topLayout.attachPosition(self.m_genJointsButton, 'left', 20, 50)
-        self.m_topLayout.attachControl(self.m_genJointsButton, 'bottom', 20,self.m_closeButton)
+        self.m_topLayout.attachForm(self.m_genRigButton, 'right', 20)
+        self.m_topLayout.attachPosition(self.m_genRigButton, 'left', 20, 50)
+        self.m_topLayout.attachControl(self.m_genRigButton, 'bottom', 20,self.m_closeButton)
                 
         #-------------misc control attach-------------#
                 

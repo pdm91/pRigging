@@ -5,6 +5,7 @@ import os
 import pRigging.src.riggingbase as prb
 import pRigging.src.ui.starttabnovice as pstn
 import pRigging.src.ui.armtabnovice as patn
+import pRigging.src.ui.armtabintermediate as pati
 import pRigging.src.armrig as par
 
 #----------GUI-Class----------#
@@ -83,6 +84,14 @@ class Gui (prb.RiggingBase):
             f.close
         
         else:
+            
+            #make sure the folder is there
+            
+            if not os.path.exists(os.path.expandvars(self.m_toolRoot+".prefs")):
+                
+                #if not make it
+                
+                os.mkdir(os.path.expandvars(self.m_toolRoot+".prefs"))
             
             #set a default value for the skill level
         
@@ -169,8 +178,7 @@ class Gui (prb.RiggingBase):
                                   
         self.m_outerForm.attachControl(self.m_tabs, 'top', 5, self.m_userSkillRB)
                                      
-        self.m_outerForm.attachPosition(self.m_tabs, 'right', 0, 50)
-        self.m_outerForm.attachPosition(self.m_userSkillRB, 'right',0,50)
+        self.m_outerForm.attachPosition(self.m_tabs, 'right', 0,70)
                                        
         self.m_outerForm.attachNone(self.m_userSkillRB, 'bottom')
                     
@@ -245,7 +253,7 @@ class Gui (prb.RiggingBase):
             arm = par.ArmRig(name)
             self.m_rigComponents.append(arm)
             
-            self.m_tabList.append(patn.ArmTabNovice(self.m_tabs,self,"Arm", arm))
+            self.m_tabList.append(pati.ArmTabIntermediate(self.m_tabs,self,"Arm", arm))
             self.m_tabs.setSelectTabIndex(len(self.m_tabList))           
 
             
@@ -297,5 +305,5 @@ def lrPrompt():
     
 
 #----------END-GUI-Class----------#       
-reload(patn)
+reload(pati)
 gui = Gui()
