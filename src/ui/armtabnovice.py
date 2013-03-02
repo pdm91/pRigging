@@ -58,7 +58,7 @@ class ArmTabNovice(prb.RiggingBase):
                 
         while not result:
                 
-            if pm.formLayout(_name, q = True, ex = True):
+            if pm.formLayout(self.m_name, q = True, ex = True):
             
                 self.m_name = self.addExtToNames(self.removeExtFromNames([self.m_name]), str(i))[0]
                 

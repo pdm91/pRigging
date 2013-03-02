@@ -50,12 +50,14 @@ class StartTabNovice(prb.RiggingBase):
         result = False
              
         i = 1
+        
+        self.m_name
                 
         while not result:
                 
-            if pm.formLayout(_name, q = True, ex = True):
+            if pm.formLayout(self.m_name, q = True, ex = True):
             
-                _name = self.addExtToNames(self.removeExtFromNames([_name]), str(i))[0]
+                self.m_name = self.addExtToNames(self.removeExtFromNames([self.m_name]), str(i))[0]
                 
             else:
                 

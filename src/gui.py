@@ -5,7 +5,7 @@ import os
 import pRigging.src.riggingbase as prb
 import pRigging.src.ui.starttabnovice as pstn
 import pRigging.src.ui.armtabnovice as patn
-import prigging.src.armrig as par
+import pRigging.src.armrig as par
 
 #----------GUI-Class----------#
 
@@ -296,5 +296,5 @@ def lrPrompt():
     
 
 #----------END-GUI-Class----------#       
-
+reload(patn)
 gui = Gui()
