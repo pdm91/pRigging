@@ -245,7 +245,8 @@ class Gui (prb.RiggingBase):
             arm = par.ArmRig(name)
             self.m_rigComponents.append(arm)
             
-            self.m_tabList.append(patn.ArmTabNovice(self.m_tabs,self,"Arm", arm))            
+            self.m_tabList.append(patn.ArmTabNovice(self.m_tabs,self,"Arm", arm))
+            self.m_tabs.setSelectTabIndex(len(self.m_tabList))           
 
             
             
