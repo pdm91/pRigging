@@ -51,7 +51,7 @@ class StartTabNovice(prb.RiggingBase):
              
         i = 1
         
-        self.m_name
+        self.m_name = _name
                 
         while not result:
                 
