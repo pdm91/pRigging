@@ -8,6 +8,7 @@ import pRigging.src.ui.armtabnovice as patn
 import pRigging.src.ui.armtabintermediate as pati
 import pRigging.src.ui.armtabexperienced as pate
 import pRigging.src.armrig as par
+import pRigging.src.ui.tabsettings as pts
 
 #----------GUI-Class----------#
 
@@ -213,8 +214,44 @@ class Gui (prb.RiggingBase):
             #set the skill level
         
             self.m_skillLevel = _newLevel
-            #pm.deleteUI(self.m_tabs)
-            self.genGui(self.m_skillLevel)
+            
+            #set the id for selection after the transfer
+            
+            id = self.m_tabs.getSelectTabIndex()
+            
+            for i in range(1, len(self.m_tabList)):
+                
+                #get the type
+                
+                type = self.m_tabList[i].getType()
+                
+                if type == "arm":
+                    
+                    #clear the current tab storing the settings
+                    
+                    settings = self.m_tabList[i].clear()
+                    
+                    #replace the existing tab with a new one,
+                    #this will take the reference count of the tab to
+                    #0 and python will remove it
+                    
+                    self.m_tablist[i] = pate.ArmTabExperienced(self.m_tabs,self, settings)
+                    
+                    if self.m_skillLevel == "Novice":
+                        
+                        self.m_tabList[i] = patn.ArmTabNovice(self.m_tabs,self, settings)
+                                                
+                    elif self.m_skillLevel == "Intermediate":
+                        
+                        self.m_tabList[i] = pati.ArmTabIntermediate(self.m_tabs,self, settings)
+                        
+                    elif self.m_skillLevel == "Experienced":
+                    
+                        self.m_tabList[i] = pate.ArmTabExperienced(self.m_tabs,self, settings)            
+                
+            #re-select the chosen tab
+            
+            self.m_tabs.setSelectTabIndex(id)
             
             #save the file to the maya prefs folder
             
@@ -254,7 +291,28 @@ class Gui (prb.RiggingBase):
             arm = par.ArmRig(name)
             self.m_rigComponents.append(arm)
             
-            self.m_tabList.append(pate.ArmTabExperienced(self.m_tabs,self,"Arm", arm,"L"))
+            #set up a settings object for the tab settings
+            settings = pts.TabSettings()
+            
+            settings.m_tabName = "Arm Tab"
+            settings.m_limbName = "Arm"
+            settings.m_sideSpecifier = side
+            settings.m_rigElement = arm
+            
+            #switch through the dificulty levels
+            
+            if self.m_skillLevel == "Novice":
+                
+                self.m_tabList.append(patn.ArmTabNovice(self.m_tabs,self, settings))
+                
+            elif self.m_skillLevel == "Intermediate":
+                
+                self.m_tabList.append(pati.ArmTabIntermediate(self.m_tabs,self, settings))
+                
+            elif self.m_skillLevel == "Experienced":
+            
+                self.m_tabList.append(pate.ArmTabExperienced(self.m_tabs,self, settings))
+            
             self.m_tabs.setSelectTabIndex(len(self.m_tabList))           
 
             
@@ -307,4 +365,7 @@ def lrPrompt():
 
 #----------END-GUI-Class----------#       
 reload(pate)
+reload(patn)
+reload(pati)
+reload(pts)
 gui = Gui()

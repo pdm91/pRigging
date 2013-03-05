@@ -1,11 +1,12 @@
 #----------Imports----------#
 
 import pymel.core as pm
-import pRigging.src.riggingbase as prb
+import pRigging.src.ui.tabbase as ptb
+import pRigging.src.ui.tabsettings as pts
 
 #----------ArmTabIntermediate-Class----------#
 
-class ArmTabIntermediate(prb.RiggingBase):
+class ArmTabIntermediate(ptb.TabBase):
     
     """
         Class: ArmTabIntermediate
@@ -19,10 +20,11 @@ class ArmTabIntermediate(prb.RiggingBase):
 
         Imports:
             pymel.core as pm
-            pRigging.src.riggingbase as prb     
+            pRigging.src.ui.tabbase as ptb
+            pRigging.src.ui.tabsettings as pts
     """
     
-    def __init__(self,_parent,_guiInstance,_name, _arm):
+    def __init__(self,_parent,_guiInstance, _settings):
         
         """
             Method: __init__
@@ -38,45 +40,18 @@ class ArmTabIntermediate(prb.RiggingBase):
                 _arm:                   The rig Component passed in by the ui 
         """
         
-        #set the parent ui 
+        #initialise the base class
         
-        pm.setParent(_parent)
+        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm')
         
-        #and store a pointer to the gui instance for calling parent methods to add a tab 
+        #and initialise variables to stor the settings that are not stores by a ui element
         
-        self.m_gui = _guiInstance
-        
-        #check if the name exists, if it does, add a number to make it unique
-        
-        result = False
-        
-        #store the name
-        
-        self.m_name = _name
-             
-        i = 1
-                
-        while not result:
-                
-            if pm.formLayout(self.m_name, q = True, ex = True):
-            
-                self.m_name = self.addExtToNames(self.removeExtFromNames([self.m_name]), str(i))[0]
-                
-            else:
-                
-                result = True
-                    
-            i = i+1
-        
-        #set the layout
-        
-        self.m_topLayout =  pm.formLayout(self.m_name, numberOfDivisions = 100)
-        
-        #set up the rig component
-        
-        self.m_arm = _arm
-        
-        #add text
+        self.m_doSideSpecify = _settings.m_doSideSpecify
+        self.m_sideSpecifier = _settings.m_sideSpecifier
+        self.m_ikExt = _settings.m_ikExt
+        self.m_fkExt = _settings.m_fkExt
+        self.m_jntExt = _settings.m_jntExt
+        self.m_ctrlExt = _settings.m_ctrlExt
         
         #-------------step 1 text generate-------------#
         
@@ -106,7 +81,7 @@ class ArmTabIntermediate(prb.RiggingBase):
         #-------------step 2 control generate-------------#
         
         self.m_nameOverrideCheck =  pm.checkBox(ann = "override the limb name?", v = False, l = "")
-        self.m_nameOverrideText = pm.textField(tx = "Arm", ann = "Enter the name of the rig here", en = False)
+        self.m_nameOverrideText = pm.textField(tx = _settings.m_limbName, ann = "Enter the name of the rig here", en = False)
         
         #-------------step 3 text generate-------------#
         
@@ -121,6 +96,10 @@ class ArmTabIntermediate(prb.RiggingBase):
         #-------------step 3 control generate-------------#
         
         self.m_jointTable = pm.textScrollList()
+        
+        for tempJnt in _settings.m_jntList:
+            self.m_jointTable.append(tempJnt)
+        
         self.m_loadJointsButton = pm.button(l = "Load Joints")
         
         #-------------step 4 text generate-------------#
@@ -144,8 +123,8 @@ class ArmTabIntermediate(prb.RiggingBase):
         
         #-------------step 5 control generate-------------#
         
-        self.m_ikCheck = pm.checkBox(l = "IK", ann = "Generate an IK chain?", v = True)
-        self.m_fkCheck = pm.checkBox(l = "FK", ann = "Generate an FK chain?", v = True)
+        self.m_ikCheck = pm.checkBox(l = "IK", ann = "Generate an IK chain?", v = _settings.m_doIK)
+        self.m_fkCheck = pm.checkBox(l = "FK", ann = "Generate an FK chain?", v = _settings.m_doFK)
         
         self.m_numTwistText = pm.text(label = "Number of twist joints to be generated:",
                                     al = "left",
@@ -153,7 +132,7 @@ class ArmTabIntermediate(prb.RiggingBase):
                                     fn = "smallBoldLabelFont",
                                     h = 20,
                                     ww = True)
-        self.m_numTwistJntsVal = pm.intField(v = 3, ann = "Enter the number of twist joints to\n generate in each twist chain\n ignored if no joints selected to be\n the roots of twist chains")       
+        self.m_numTwistJntsVal = pm.intField(v = _settings.m_numTwistJnts, ann = "Enter the number of twist joints to\n generate in each twist chain\n ignored if no joints selected to be\n the roots of twist chains")       
                 
         self.m_genRigButton = pm.button(l = "Generate Rig")
         self.m_reGenRigButton = pm.button(l = "Regenerate rig")
@@ -270,6 +249,47 @@ class ArmTabIntermediate(prb.RiggingBase):
         self.m_topLayout.attachForm(self.m_closeButton, 'bottom', 20)
         
         
+    def clearTab(self):
+        
+        """
+            Method: clearTab
+                A method to clear out the tab, returns a TabSettings object
+                
+            On Exit:                The tab has been removed, and the uiElements
+                                    deleted, and a settins object returned to 
+                                    allow for continuity of choices across user
+                                    skill levels
+        """
+        
+        #generate a TabSettings object
+                                    
+        settings = pts.TabSettings()
+        
+        #store the appropriate values in the TabSettings Object
+        
+        settings.m_tabName = self.m_topLayout.shortName()
+        settings.m_limbName = self.m_nameOverrideText.getText()
+        settings.m_doSideSpecify = self.m_doSideSpecify
+        settings.m_sideSpecifier = self.m_sideSpecifier
+        settings.m_jntList = self.m_jointTable.getAllItems()
+        settings.m_numTwistJnts = self.m_numTwistJntsVal.getValue()
+        settings.m_doIK = self.m_ikCheck.getValue()
+        settings.m_ikExt = self.m_ikExt
+        settings.m_doFK = self.m_fkCheck.getValue()
+        settings.m_fkExt = self.m_fkExt
+        settings.m_jntExt = self.m_jntExt
+        settings.m_ctrlExt = self.m_ctrlExt
+        settings.m_rigElement = self.m_rigElement
+        
+        #delete the ui
+        
+        pm.deleteUI(self.m_topLayout)
+        
+        #and return the  settings object
+        
+        return settings
+        
+
                                      
 
 #----------END-ArmTabIntermediate-Class----------#       
