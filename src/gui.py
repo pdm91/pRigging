@@ -6,6 +6,7 @@ import pRigging.src.riggingbase as prb
 import pRigging.src.ui.starttabnovice as pstn
 import pRigging.src.ui.armtabnovice as patn
 import pRigging.src.ui.armtabintermediate as pati
+import pRigging.src.ui.armtabexperienced as pate
 import pRigging.src.armrig as par
 
 #----------GUI-Class----------#
@@ -253,7 +254,7 @@ class Gui (prb.RiggingBase):
             arm = par.ArmRig(name)
             self.m_rigComponents.append(arm)
             
-            self.m_tabList.append(pati.ArmTabIntermediate(self.m_tabs,self,"Arm", arm))
+            self.m_tabList.append(pate.ArmTabExperienced(self.m_tabs,self,"Arm", arm,"L"))
             self.m_tabs.setSelectTabIndex(len(self.m_tabList))           
 
             
@@ -305,5 +306,5 @@ def lrPrompt():
     
 
 #----------END-GUI-Class----------#       
-reload(pati)
+reload(pate)
 gui = Gui()

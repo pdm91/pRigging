@@ -8,11 +8,11 @@ import pRigging.src.riggingbase as prb
 class ArmTabIntermediate(prb.RiggingBase):
     
     """
-        Class: ArmTabNovice
+        Class: ArmTabIntermediate
             A class containing all of the code for generating an arm tab 
-            for the novice dificulty rating 
+            for the intermediate dificulty rating 
         
-        File: pRigging/src/ui/armtabnovice.py
+        File: pRigging/src/ui/armtabintermediate.py
         
         Contains:
             self.m_topLayout
@@ -126,7 +126,7 @@ class ArmTabIntermediate(prb.RiggingBase):
         #-------------step 4 text generate-------------#
                 
         self.m_step4Label = pm.text(label="4:", fn = "boldLabelFont")
-        self.m_step4Text = pm.text(label = "Select, in the box above, which joints, if any, you want to be the root of a twist chain",
+        self.m_step4Text = pm.text(label = "Select, in the boxbelow, which joints, if any, you want to be the root of a twist chain",
                                     ann = "Note: If the last joint is selected \nit will be disregarded as it not \nwithin the scope of this joint chain", 
                                     al = "left",
                                     fn = "smallBoldLabelFont",
@@ -170,7 +170,6 @@ class ArmTabIntermediate(prb.RiggingBase):
         self.m_topLayout.attachForm(self.m_step1Text,'top', 22)
         
         self.m_topLayout.attachControl(self.m_step1Text,'left', 20, self.m_step1Label)
-        #self.m_topLayout.attachPosition(self.m_step1Text, 'right', 20,70)
         
         #-------------step 1 controls attach-------------#
         
@@ -186,8 +185,6 @@ class ArmTabIntermediate(prb.RiggingBase):
       
         self.m_topLayout.attachControl(self.m_step2Text, 'top', 23, self.m_jointToolButton)
         self.m_topLayout.attachControl(self.m_step2Text, 'left', 20, self.m_step2Label)
-        
-        #self.m_topLayout.attachPosition(self.m_step2Text, 'right', 20, 70)
         
         #-------------step 2 control attach-------------#
         
@@ -213,20 +210,20 @@ class ArmTabIntermediate(prb.RiggingBase):
         
         self.m_topLayout.attachForm(self.m_jointTable, 'left', 30)
         self.m_topLayout.attachPosition(self.m_jointTable, 'right', 20, 50)
-        self.m_topLayout.attachControl(self.m_jointTable,'top', 20, self.m_step3Text)
-        self.m_topLayout.attachControl(self.m_jointTable,'bottom', 20, self.m_loadJointsButton)
+        self.m_topLayout.attachForm(self.m_jointTable,'bottom', 20)
+        self.m_topLayout.attachControl(self.m_jointTable,'top', 20, self.m_step4Text)
                 
         self.m_topLayout.attachForm(self.m_loadJointsButton, 'left', 20)
         self.m_topLayout.attachControl(self.m_loadJointsButton, 'right', 20, self.m_genRigButton)
-        self.m_topLayout.attachControl(self.m_loadJointsButton, 'bottom', 20,self.m_closeButton)
+        self.m_topLayout.attachControl(self.m_loadJointsButton, 'top', 20,self.m_step3Text)
         
         
         #-------------step 4 text attach-------------#
         
         self.m_topLayout.attachForm(self.m_step4Label, 'left', 20)
-        self.m_topLayout.attachForm(self.m_step4Label, 'bottom', 20)
+        self.m_topLayout.attachControl(self.m_step4Label, 'top', 20, self.m_loadJointsButton)
         
-        self.m_topLayout.attachForm(self.m_step4Text, 'bottom', 20)
+        self.m_topLayout.attachControl(self.m_step4Text, 'top', 20, self.m_loadJointsButton)
         self.m_topLayout.attachControl(self.m_step4Text, 'left', 20, self.m_step4Label)
         self.m_topLayout.attachControl(self.m_step4Text, 'right', 20, self.m_closeButton)
         
