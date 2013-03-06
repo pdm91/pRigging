@@ -108,6 +108,11 @@ class ArmRig(prb.RiggingBase):
         if _templateJoints == []:
             
             return ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"]
+            
+        elif len(_templateJoints) == 1:
+            
+            return ["ERROR","NOT ENOUGH JOINTS","ERROR: You need to select at least 2 joints"]
+
         
         #set the template joints
         
@@ -399,5 +404,19 @@ class ArmRig(prb.RiggingBase):
         return self.m_isGenerated
             
         """--------------------"""
+        
+    def setVis(self, _val):
+        
+        """
+            Method: setVis
+                A method to set the visibility of the arm rig
+                
+            Inputs:
+                _val:                   The value to set it to, boolean
+        """
+        
+        if self.m_topGroup != "":
+            
+            self.m_topGroup.visibility.set(_val)
         
 #----------END-ArmRig-Class----------#  

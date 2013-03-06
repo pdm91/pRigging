@@ -35,9 +35,8 @@ class ArmTabNovice(ptb.TabBase):
                                         created.
                 _parent:                The parent ui element for the layout
                 _guiInstance:           The instance of the GUI class
-                _name:                  The name to attempt to call the tab, a unique
-                                        name will be generated if the one passed in cannot be used
-                _arm:                   The rig Component passed in by the ui 
+                _settings:              A struct containing all of the relevant information
+                                        for the generation of the tab
         """
         
         #initialise the base class
@@ -112,7 +111,7 @@ class ArmTabNovice(ptb.TabBase):
         
         #-------------misc control generate-------------#
         
-        self.m_closeButton = pm.button(l = "Close Tab")
+        self.m_closeButton = pm.button(l = "Close Tab", c = pm.Callback(self.m_gui.closeCurrentTab))
         
 
         #-------------step 1 text attach-------------#
@@ -304,7 +303,7 @@ class ArmTabNovice(ptb.TabBase):
                 
                 #currently print, will be refactored to use the help box
                 
-                print ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"]
+                 self.m_gui.getHelp().update( _errorList =["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"])
                 
             #otherwise continue with the generation
             
@@ -320,7 +319,7 @@ class ArmTabNovice(ptb.TabBase):
                     
                     #temp print, will use the help box eventually
                     
-                    print ["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"]
+                    self.m_gui.getHelp().update( _errorList = ["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"])
                 
                 else:
                             
@@ -339,8 +338,24 @@ class ArmTabNovice(ptb.TabBase):
                                 _twistStartIds = [-2],
                                 _numTwistJnts = self.m_numTwistJnts
                                 )
-                            
-        #############DEAL WITH RESULT##################
+                                
+                    self.m_gui.getHelp().update( _errorList = result)
+
+    def getInfo(self):
+        """
+            Method: getInfo
+                A method to return information about the tab for use 
+                with the help box           
+        """                      
+        
+        jointsLoaded = False
+        
+        if len(self.m_jointTable.getAllItems()) != 0:
+            
+            jointsLoaded = True
+        
+        return [self.m_type, jointsLoaded,self.m_rigElement.getIsGenerated()]      
+
         
 def forcePrompt():
     """

@@ -76,6 +76,10 @@ class Gui (prb.RiggingBase):
         #rig components
         
         self.m_rigComponents = []
+        
+        #unique id
+        
+        self.uID = 1
                 
         #if the prefs file isn't empty
         
@@ -142,12 +146,12 @@ class Gui (prb.RiggingBase):
         
         #create the show/hide buttons
         
-        self.m_hideRigButton = pm.button(l = "Hide Rig")        
-        self.m_hideChainButton = pm.button(l = "Hide Current Chain")
-        self.m_showRigButton = pm.button(l = "Show Rig")        
-        self.m_showChainButton = pm.button(l = "Show Current Chain")
+        self.m_hideRigButton = pm.button(l = "Hide Rig", c = pm.Callback(self.setVisRig, False))        
+        self.m_hideChainButton = pm.button(l = "Hide Current Element", c = pm.Callback(self.setVisElement, False))
+        self.m_showRigButton = pm.button(l = "Show Rig", c = pm.Callback(self.setVisRig, True))        
+        self.m_showChainButton = pm.button(l = "Show Current Element", c = pm.Callback(self.setVisElement, True))
         
-        self.m_helpBox = phb.HelpBox(self.m_outerForm)
+        self.m_helpBox = phb.HelpBox(self.m_outerForm, self)
         helpBoxUI = self.m_helpBox.getTopUI()   
         
         pm.setParent(self.m_outerForm)   
@@ -292,17 +296,12 @@ class Gui (prb.RiggingBase):
             
             side = pm.layoutDialog(t = "Pick Sides", ui = lrPrompt)
             
-
-            
-            #make an arm rig and add it to the rig components
-            
-            
-            
             #set up a settings object for the tab settings
             settings = pts.TabSettings()
             
             settings.m_baseName = self.m_tabList[0].getRigName()
-            settings.m_tabName = "Arm Tab"
+            settings.m_tabName = "Arm Tab " + str(self.uID)
+            self.uID = self.uID+1
             settings.m_limbName = "Arm"
             settings.m_sideSpecifier = side
             
@@ -328,10 +327,98 @@ class Gui (prb.RiggingBase):
             
             self.m_tabs.setSelectTabIndex(len(self.m_tabList))
             
+            self.m_helpBox.update()
             
-
-
+    def getHelp(self):
+        
+        """
+            Method: getHelp
+                A method to return the helpBox instance
+        """
+        
+        return self.m_helpBox
+        
+    def getTabInfo(self):
+        
+        """
+            Method: getTabInfo
+                A method to return some information about the currently 
+                active tab in the format 
+                [<type>, <isJointsLoaded>, <isElementGenerated>]
+        """
+        
+        #work out which tab is the currently active one
+        
+        ID = self.m_tabs.getSelectTabIndex() -1 #-1 because the layout 
+                                                #uses a 1 based index
+        try: 
+                                               
+            return self.m_tabList[ID].getInfo()
+        
+        except:
             
+            #this is messy, start tab needs to store a type, and this 
+            #needs to be returned instead of relying on try/except
+            
+            return["Start Tab"]
+            
+    def setVisElement(self, _val):
+        
+        """
+            Method: setVisChain
+                a method to set the visibility of the currently active
+                element
+            
+            Inputs:
+                _val:               The boolean value to set the 
+                                    specified visibility to
+        """
+        
+        #get the id of the currently selected tab
+        
+        ID = self.m_tabs.getSelectTabIndex() -1 #-1 because the layout 
+                                                #uses a 1 based index
+                                                
+        self.m_tabList[ID].setVis(_val)
+        
+    def setVisRig(self, _val):
+        
+        """
+            Method: setVisChain
+                a method to set the visibility of the whole rig
+            
+            Inputs:
+                _val:               The boolean value to set the 
+                                    specified visibility to
+        """
+        
+        for element in self.m_rigComponents:
+            
+            element.setVis(_val)
+
+    def closeCurrentTab(self):
+        
+        """
+            Method: closeCurrentTab
+                A method to close the current tab
+        """
+        
+        ID = self.m_tabs.getSelectTabIndex() -1
+        if ID != 0:
+            
+            print ID
+            
+            print "tab:   ",   self.m_tabList[ID]
+            print "tabList:  ", self.m_tabList
+            
+            print "uiForm = ", self.m_tabs.getSelectTab()
+            print "uiFormList= ", self.m_tabs.getChildArray()
+                
+            self.m_tabList[ID].closeUI()
+            
+            self.m_tabList.pop(ID)
+            
+        
             
             
 def lrPrompt():
@@ -383,6 +470,4 @@ def lrPrompt():
     
 
 #----------END-GUI-Class----------#       
-reload(par)
-reload (pati)
-gui = Gui()
+

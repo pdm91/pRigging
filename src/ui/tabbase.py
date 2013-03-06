@@ -71,7 +71,7 @@ class TabBase(prb.RiggingBase):
         i = 1
                 
         while not result:
-                
+            print pm.formLayout(self.m_name, q = True, ex = True)
             if pm.formLayout(self.m_name, q = True, ex = True):
             
                 self.m_name = self.addExtToNames(self.removeExtFromNames([self.m_name]), str(i))[0]
@@ -81,6 +81,8 @@ class TabBase(prb.RiggingBase):
                 result = True
                     
             i = i+1
+            
+            
         
         #set the layout
         
@@ -105,6 +107,32 @@ class TabBase(prb.RiggingBase):
         """
         
         return self.m_type
-                                       
+        
+    def setVis(self, _val):
+        
+        """
+            Method: setVis
+                A method to set the visibility of the rig element stored in
+                the current tab
+                
+            Inputs:
+                _val:                   The value to set it to, boolean
+        """
+                  
+        self.m_rigElement.setVis(_val)
+    
+    def closeUI(self):
+        
+        """
+            Method: closeUI
+                A method to clear up the ui elements
+        """
+        try:
+            
+            pm.deleteUI(self.m_topLayout)
+            
+        except:
+            
+            pass
 
-#----------END-TabBase-Class----------#       
+#----------END-TabBase-Class----------# 
