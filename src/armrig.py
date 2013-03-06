@@ -103,6 +103,12 @@ class ArmRig(prb.RiggingBase):
             On Exit:                The arm has been generated.
         """
         
+        #if no joints are passed in
+        
+        if _templateJoints == []:
+            
+            return ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"]
+        
         #set the template joints
         
         self.m_templateJoints = _templateJoints[:]
@@ -180,7 +186,7 @@ class ArmRig(prb.RiggingBase):
                 extOver = _fkExt
                 
             #generate the FK Chain
-            
+            print extOver
             self.m_fkChain = pfc.FKChain()
 
             self.m_fkChain.genChain( self.m_templateJoints, names, _extOverride = extOver, _jointExt = _jntExt, _controlExt = _ctrlExt)

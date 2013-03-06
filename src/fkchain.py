@@ -113,7 +113,7 @@ class FKChain(pjcc.JointChainContainer):
             #make a control based on the list, connect it with an orient constraint
             
             self.m_controls.append(pctrl.Control())
-            self.m_controls[i].genCtrl(joint, _name = self.removeExtFromNames([newNames[i]])[0], _addConstraintToObj = ["orient"], _cExt = _controlExt)
+            self.m_controls[i].genCtrl(joint, _name = newNames[i], _addConstraintToObj = ["orient"], _cExt = _controlExt)
             
             i = i + 1
             

@@ -285,7 +285,6 @@ class ArmTabNovice(ptb.TabBase):
         
         if not isChainExist:        
             
-            print "INGENERATION", isChainExist, force
             #create a list of the unicode strings representing
             #the selected joints and an empty list for their
             #pynode counterparts
@@ -299,26 +298,48 @@ class ArmTabNovice(ptb.TabBase):
                 
                 pyNodeList.append(pm.PyNode(jnt))
                 
-            #set the m_template joints equal to those passed in with hierarchy enforced
+            #check that there are some joints
             
-            pyNodeList = self.enforceHierarchy(pyNodeList)
+            if pyNodeList == []:
                 
-            #and set the root name for the arm
+                #currently print, will be refactored to use the help box
+                
+                print ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"]
+                
+            #otherwise continue with the generation
             
-            self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_limbName)[0])
-            
-            result = self.m_rigElement.genArmRig(pyNodeList,
-                        _doIK = self.m_ikCheck.getValue(),
-                        _ikExt = self.m_ikExt,
-                        _doFK = self.m_fkCheck.getValue(),
-                        _fkExt = self.m_fkExt,
-                        _jntExt = self.m_jntExt,
-                        _ctrlExt = self.m_ctrlExt,
-                        _doTwist = self.m_twistCheck.getValue(), 
-                        _twistStartIds = [-2],
-                        _numTwistJnts = self.m_numTwistJnts
-                        )
-                        
+            else:
+                
+                #set the m_template joints equal to those passed in with hierarchy enforced
+                
+                pyNodeList = self.enforceHierarchy(pyNodeList)
+                
+                #now check if there is any nodes in the joint list
+                
+                if pyNodeList == []:
+                    
+                    #temp print, will use the help box eventually
+                    
+                    print ["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"]
+                
+                else:
+                            
+                    #and set the root name for the arm
+                    
+                    self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_limbName)[0])
+                    
+                    result = self.m_rigElement.genArmRig(pyNodeList,
+                                _doIK = self.m_ikCheck.getValue(),
+                                _ikExt = self.m_ikExt,
+                                _doFK = self.m_fkCheck.getValue(),
+                                _fkExt = self.m_fkExt,
+                                _jntExt = self.m_jntExt,
+                                _ctrlExt = self.m_ctrlExt,
+                                _doTwist = self.m_twistCheck.getValue(), 
+                                _twistStartIds = [-2],
+                                _numTwistJnts = self.m_numTwistJnts
+                                )
+                            
         #############DEAL WITH RESULT##################
         
 def forcePrompt():

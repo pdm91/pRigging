@@ -352,56 +352,80 @@ class ArmTabIntermediate(ptb.TabBase):
             
             pyNodeList.append(pm.PyNode(jnt))
             
-        #enfoce the hierarchy
+        #check that there are some joints
         
-        pyNodeList = self.enforceHierarchy(pyNodeList)
-        
-        #get a list of the selected items
-        
-        twistRootList = self.m_jointTable.getSelectItem()
-        
-        #variable defining whether or not to generate a twist chain
-        
-        doTwist = True
-        
-        if twistRootList == []:
-        
-            doTwist = False
-        
-        #generate a list for the twist root indices
-        
-        indexList = []
-        
-        #then cycle through the ordered pynode list
-        
-        for i in range (0, len(pyNodeList)-1):
-                        
-            #cycle through all of the selected joints
+        if pyNodeList == []:
             
-            for jnt in twistRootList:
-                
-                #if they are the same, add the id into the list
-                
-                if jnt == pyNodeList[i]:
-                    
-                    indexList.append(i)
-                    
-        #and set the root name for the arm
+            #currently print, will be refactored to use the help box
+            
+            print ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"]
+            
+        #otherwise continue with the generation
         
-        self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_nameOverrideText.getText())[0])
+        else:
         
-        result = self.m_rigElement.genArmRig(pyNodeList,
-                    _doIK = self.m_ikCheck.getValue(),
-                    _ikExt = self.m_ikExt,
-                    _doFK = self.m_fkCheck.getValue(),
-                    _fkExt = self.m_fkExt,
-                    _jntExt = self.m_jntExt,
-                    _ctrlExt = self.m_ctrlExt,
-                    _doTwist = doTwist, 
-                    _twistStartIds = indexList,
-                    _numTwistJnts =  self.m_numTwistJntsVal.getValue()
-                    )
+                
+            #enfoce the hierarchy
+            
+            pyNodeList = self.enforceHierarchy(pyNodeList)
+            
+            #now check if there is any nodes in the joint list
+            
+            if pyNodeList == []:
+                
+                #temp print, will use the help box eventually
+                
+                print ["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"]
+            
+            else:
+
+                
+                #get a list of the selected items
+                
+                twistRootList = self.m_jointTable.getSelectItem()
+                
+                #variable defining whether or not to generate a twist chain
+                
+                doTwist = True
+                
+                if twistRootList == []:
+                
+                    doTwist = False
+                
+                #generate a list for the twist root indices
+                
+                indexList = []
+                
+                #then cycle through the ordered pynode list
+                
+                for i in range (0, len(pyNodeList)-1):
+                                
+                    #cycle through all of the selected joints
                     
+                    for jnt in twistRootList:
+                        
+                        #if they are the same, add the id into the list
+                        
+                        if jnt == pyNodeList[i]:
+                            
+                            indexList.append(i)
+                            
+                #and set the root name for the arm
+                
+                self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_nameOverrideText.getText())[0])
+                
+                result = self.m_rigElement.genArmRig(pyNodeList,
+                            _doIK = self.m_ikCheck.getValue(),
+                            _ikExt = self.m_ikExt,
+                            _doFK = self.m_fkCheck.getValue(),
+                            _fkExt = self.m_fkExt,
+                            _jntExt = self.m_jntExt,
+                            _ctrlExt = self.m_ctrlExt,
+                            _doTwist = doTwist, 
+                            _twistStartIds = indexList,
+                            _numTwistJnts =  self.m_numTwistJntsVal.getValue()
+                            )
+                            
         #############DEAL WITH RESULT##################
         
     def reGenChain(self):
