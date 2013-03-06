@@ -47,7 +47,7 @@ class JointChain(prb.RiggingBase):
         
         """--------------------"""
     
-    def genJoints(self, _templateJoints, _jointNames):
+    def genJoints(self, _templateJoints, _jointNames, _ext = ""):
         
         """
             Method: genJoints
@@ -66,6 +66,12 @@ class JointChain(prb.RiggingBase):
         """
         
         #generate the joint chain based on the selected joints, and the names passed in as inputs
+        
+        #set the joint extension value
+        
+        if _ext != "":
+			
+			self.m_ext = _ext
         
         #check that the number of template joints match the number of names provided
         
@@ -139,7 +145,8 @@ class JointChain(prb.RiggingBase):
                             _posOnBottom = False,
                             _pob = False,
                             _parentToTop = True,
-                            _ptt = True
+                            _ptt = True,
+                            _ext = ""
                             ):
                             
         """
@@ -174,6 +181,12 @@ class JointChain(prb.RiggingBase):
                                         and named correctly                          
         """
         
+        #set the extension
+        
+        if _ext != "":
+			
+			self.m_ext = _ext
+			
         #get the position in world space of the two joints passed in
         
         topPos = _topJoint.getTranslation(space='world')

@@ -54,7 +54,7 @@ class FKChain(pjcc.JointChainContainer):
         
         """--------------------"""
     
-    def genChain(self, _templateJoints, _names, _extOverride = ""):
+    def genChain(self, _templateJoints, _names, _extOverride = "", _jointExt = "", _controlExt = ""):
         
         """
             Method: genChain
@@ -86,7 +86,6 @@ class FKChain(pjcc.JointChainContainer):
             
             newNames = self.addExtToNames( newNames, "FK")
             
-            print newNames, "lookatme2"
             groupName = self.addExtToNames(self.removeExtFromNames([groupName]),"FK")[0]
         
         else:
@@ -99,7 +98,7 @@ class FKChain(pjcc.JointChainContainer):
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
         self.m_jointChain = pjc.JointChain()
-        self.m_jointChain.genJoints(_templateJoints, newNames)
+        self.m_jointChain.genJoints(_templateJoints, newNames, _ext = _jointExt)
         
         #for each joint in the list
         
@@ -112,7 +111,7 @@ class FKChain(pjcc.JointChainContainer):
             #make a control based on the list, connect it with an orient constraint
             
             self.m_controls.append(pctrl.Control())
-            self.m_controls[i].genCtrl(joint, _name = self.removeExtFromNames([newNames[i]])[0], _addConstraintToObj = ["orient"])
+            self.m_controls[i].genCtrl(joint, _name = self.removeExtFromNames([newNames[i]])[0], _addConstraintToObj = ["orient"], _cExt = _controlExt)
             
             i = i + 1
             

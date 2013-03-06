@@ -70,10 +70,16 @@ class ArmRig(prb.RiggingBase):
         
     def genArmRig(self, 
                     _templateJoints,
-                    _doIK = True, 
-                    _doFK = True, 
+                    _doIK = True,
+                    _ikExt = "", 
+                    _doFK = True,
+                    _fkExt = "",
+                    _jntExt = "",
+                    _ctrlExt = "",
                     _doTwist = True, 
-                    _twistStartIds = [-2]):
+                    _twistStartIds = [-2],
+                    _numTwistJnts = 3
+                    ):
 
         
         """
@@ -98,6 +104,12 @@ class ArmRig(prb.RiggingBase):
         #set the m_template joints equal to those passed in with hierarch enforced
         
         self.m_templateJoints = self.enforceHierarchy(_templateJoints)
+        
+        #return an error if the enforce hirearchy returns an error message
+        
+        if self.m_templateJoints == []:
+            
+            return ["ERROR","JOINT SELECTION","Error: Incorrect Joint selection, joints must be in a single hierarchy"] 
         
         #get the number of joints inputted
         
@@ -151,34 +163,45 @@ class ArmRig(prb.RiggingBase):
         
         if _doIK:
             
+            #if the extOver is not set
+            
+            if extOver != "Bind":
+                
+                extOver = _ikExt
+                
             #generate the IK chain
             
             self.m_ikChain = pic.IKChain()
             
-            self.m_ikChain.genChain(self.m_templateJoints, names, _extOverride = extOver)
-            print names, " AFTER IK "
+            self.m_ikChain.genChain(self.m_templateJoints, names, _extOverride = extOver, _jointExt = _jntExt, _controlExt = _ctrlExt)
             
         if _doFK:
             
+            #if the extOver is not set
+            
+            if extOver != "Bind":
+                
+                extOver = _fkExt
+                
             #generate the FK Chain
             
             self.m_fkChain = pfc.FKChain()
-            print names, " BEFORE FK "
-            self.m_fkChain.genChain( self.m_templateJoints, names, _extOverride = extOver)
+
+            self.m_fkChain.genChain( self.m_templateJoints, names, _extOverride = extOver, _jointExt = _jntExt, _controlExt = _ctrlExt)
             
         if _doFK and _doIK:
             
             #generate the bind chain
             
             self.m_bindChain = pbc.BindChain()
-            print names, " BEFORE BIND "
+
             if not _doTwist:
                 
                 self.m_bindChain.genChain(self.m_templateJoints, names)
                 
             else:
                 
-                 self.m_bindChain.genChain(self.m_templateJoints, names, _twistJointStartIDs = _twistStartIds)
+                 self.m_bindChain.genChain(self.m_templateJoints, names, _twistJointStartIDs = _twistStartIds, _numTwistJoints = _numTwistJnts, _jointExt = _jntExt)
                 
             self.m_bindChain.connectJointsToChains([self.m_ikChain.getJointChain(),self.m_fkChain.getJointChain()], ["orient"])
             
@@ -186,7 +209,7 @@ class ArmRig(prb.RiggingBase):
             
             self.m_FKIKControl = pctrl.Control()
             self.m_FKIKControl.genCtrl(self.m_bindChain.getJoint(-1),
-                                        _name = self.addExtToNames([_name],"FKIK")[0], 
+                                        _name = self.addExtToNames([self.m_rootName],"FKIK")[0], 
                                         _groupExtsOverride = ["0"],
                                         _parent = self.m_bindChain.getJoint(-1)
                                       )
@@ -206,7 +229,7 @@ class ArmRig(prb.RiggingBase):
                                                         _setMin = True
                                                         ) 
                                                         
-            multName = self.addExtToNames(self.addExtToNames([_name],"FKIK"),"_MINUS")[0]
+            multName = self.addExtToNames(self.addExtToNames([self.m_rootName],"FKIK"),"_MINUS")[0]
                                                         
             
             #generate a minus node and connect it up
@@ -259,6 +282,10 @@ class ArmRig(prb.RiggingBase):
         
         pm.select(cl = True)
         
+        #return success
+        
+        return ["SUCCESS","CHAIN GENERATED","SUCCESS: The chain has been successfully generated"]
+        
         """--------------------"""
         
     def genFromMirror(self, _mirrorChain):
@@ -285,4 +312,3 @@ class ArmRig(prb.RiggingBase):
         """--------------------"""
         
 #----------END-ArmRig-Class----------#  
-

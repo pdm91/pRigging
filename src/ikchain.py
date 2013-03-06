@@ -56,7 +56,7 @@ class IKChain(pjcc.JointChainContainer):
         
         """--------------------"""
     
-    def genChain(self, _templateJoints, _names, _solver = "", _extOverride = ""):
+    def genChain(self, _templateJoints, _names, _solver = "", _extOverride = "", _jointExt = "", _controlExt = ""):
         
         """
             Method: genChain
@@ -86,23 +86,17 @@ class IKChain(pjcc.JointChainContainer):
         
         if _extOverride == "":
 
-            #add IK extension to the names
-            
-            newNames = self.addExtToNames( newNames, "IK")
-            print _names, "LOOKATME"
-            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),"IK")[0]
+            _extOverride == "IK"
+          
+        #add the override extension to the names
         
-        else:
+        newNames = self.addExtToNames(newNames, _extOverride)
+        groupName = self.addExtToNames(self.removeExtFromNames([groupName]),_extOverride)[0]
             
-            #add the override extension to the names
-            
-            newNames = self.addExtToNames(newNames, _extOverride)
-            groupName = self.addExtToNames(self.removeExtFromNames([groupName]),_extOverride)[0]
-                
         #generate the joint chain based on the selected joints, and the names passed in as inputs
         
         self.m_jointChain = pjc.JointChain()
-        self.m_jointChain.genJoints(_templateJoints, newNames)
+        self.m_jointChain.genJoints(_templateJoints, newNames, _ext = _jointExt)
         
         #if the solver is not set default to rp
         
@@ -117,7 +111,7 @@ class IKChain(pjcc.JointChainContainer):
             
         #generate a name based on the root joint name
         
-        handleName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), "IK"), "HNDL")[0]
+        handleName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), _extOverride), "HNDL")[0]
            
         #then generate an IK handle
                 
@@ -129,7 +123,7 @@ class IKChain(pjcc.JointChainContainer):
         
         #and the control for it
 
-        self.m_ikControl.genCtrl(self.m_ikHandle)
+        self.m_ikControl.genCtrl(self.m_ikHandle, _cExt = _controlExt)
         
         #and set it as the parent of the IK handle
         
@@ -140,11 +134,11 @@ class IKChain(pjcc.JointChainContainer):
             #make a pole vector control
             #set the name for the control
             
-            pvName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), "IK"), "PV")[0]
+            pvName = self.addExtToNames(self.addExtToNames(self.removeExtFromNames(self.removeExtFromNames([newNames[0]])), _extOverride), "PV")[0]
             
             #add the control
             
-            self.m_ikPVControl.genCtrl(self.m_jointChain.getJoint(1), _name= pvName)
+            self.m_ikPVControl.genCtrl(self.m_jointChain.getJoint(1), _name= pvName, _cExt = _controlExt)
     
             #offset offsets the group
             
@@ -269,3 +263,4 @@ class IKChain(pjcc.JointChainContainer):
             self.m_chainGroups.append(newGroup)   
                     
 #----------END-IKChain-Class----------#  
+

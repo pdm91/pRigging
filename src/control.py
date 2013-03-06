@@ -115,6 +115,10 @@ class Control(prb.RiggingBase):
         
         if _templateObj:
             
+            #ensure pynode rather than unicode
+            
+            templateObj = pm.PyNode(_templateObj)
+            
             #check if a control extension override is set
             
             if _controlExtOverride != "":
@@ -168,7 +172,7 @@ class Control(prb.RiggingBase):
                 
                 #rotate the control to match the orientation of the template object
                 
-                self.m_control.setRotation(_templateObj.getRotation(space = 'world'))
+                self.m_control.setRotation(templateObj.getRotation(space = 'world'))
                 
             #if _noGroups is false
             
@@ -207,7 +211,7 @@ class Control(prb.RiggingBase):
                 
                 for constraint in constSet:
                     
-                    self.m_outConstraints.append(self.addConstraint(constraint, _templateObj,self.m_control))
+                    self.m_outConstraints.append(self.addConstraint(constraint, templateObj,self.m_control))
             
             #finally, if the _parent flag was set, parent the top of the control hierarchy under
             #the parent object specified

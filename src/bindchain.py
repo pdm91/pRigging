@@ -51,7 +51,7 @@ class BindChain(pjcc.JointChainContainer):
         
         """--------------------"""
     
-    def genChain(self, _templateJoints, _names, _twistJointStartIDs = [], _tjsIDs = [], _numTwistJoints = 3):
+    def genChain(self, _templateJoints, _names, _twistJointStartIDs = [], _tjsIDs = [], _numTwistJoints = 3, _jointExt = ""):
         
         """
             Method: genChain
@@ -86,7 +86,7 @@ class BindChain(pjcc.JointChainContainer):
         #generate the joint chain        
 
         self.m_jointChain = pjc.JointChain()        
-        self.m_jointChain.genJoints(_templateJoints, newNames)
+        self.m_jointChain.genJoints(_templateJoints, newNames, _ext = _jointExt)
         
         #generate the appropriate twistChains
         
@@ -110,7 +110,8 @@ class BindChain(pjcc.JointChainContainer):
                 
                 self.m_twistChains[i+initialTwistCount].genTwistChain(jointList[ids[i]],jointList[(ids[i])+1],
                         _numTwistJoints, 
-                        _name = self.addExtToNames(self.removeExtFromNames([jointList[ids[i]]]),"Twist")[0]
+                        _name = self.addExtToNames(self.removeExtFromNames([jointList[ids[i]]]),"Twist")[0],
+                        _jntExt = _jointExt
                         ) 
                         
         self.addGroupOverChain(groupName)   

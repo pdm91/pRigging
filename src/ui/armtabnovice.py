@@ -72,7 +72,7 @@ class ArmTabNovice(ptb.TabBase):
         
         #-------------step 1 control generate-------------#
         
-        self.m_jointToolButton = pm.button(l = "Joint Tool")
+        self.m_jointToolButton = pm.button(l = "Joint Tool", c = 'pm.runtime.JointTool()')
         
         #-------------step 2 text generate-------------#
         
@@ -95,12 +95,12 @@ class ArmTabNovice(ptb.TabBase):
                                     
         #-------------step 2 control generate-------------#
         
-        self.m_jointTable = pm.textScrollList()
+        self.m_jointTable = pm.textScrollList(en = False)
         
         for tempJnt in _settings.m_jntList:
             self.m_jointTable.append(tempJnt)
             
-        self.m_loadJointsButton = pm.button(l = "Load Joints")
+        self.m_loadJointsButton = pm.button(l = "Load Joints", c = pm.Callback(self.loadJoints))
         
         #-------------step 3 control generate-------------#
         
@@ -108,7 +108,7 @@ class ArmTabNovice(ptb.TabBase):
         self.m_fkCheck = pm.checkBox(l = "FK", ann = "Generate an FK chain?", v = _settings.m_doFK)
         self.m_twistCheck = pm.checkBox(l = "Forearm Twist", ann = "Add a forearm twist chain?", v = True)        
         
-        self.m_genRigButton = pm.button(l = "Generate Rig")
+        self.m_genRigButton = pm.button(l = "Generate Rig", c = pm.Callback(self.genChain))
         
         #-------------misc control generate-------------#
         
@@ -233,7 +233,60 @@ class ArmTabNovice(ptb.TabBase):
         
         return settings
         
+    def loadJoints(self):
+        
+        """
+            Method: loadJoints
+                A method to load the selected joints into the list
+                
+            On Exit:                The template joints are loaded into the list.
+        """
+        
+        #empty the items loaded into the joint box
+        
+        self.m_jointTable.removeAll()
+        
+        selection = pm.ls(sl = True, type = "joint")
+        
+        for jnt in  selection:
+            
+            self.m_jointTable.append(jnt)
+            
+    def genChain(self):
+        
+        """
+            Method: genChain
+                A method to generate the joint chain
+        """
+        
+        #create a list of the unicode strings representing
+        #the selected joints and an empty list for their
+        #pynode counterparts
+        
+        strList = self.m_jointTable.getAllItems()
+        pyNodeList = []
+        
+        #cycle through and convert to pyNode
+        
+        for jnt in strList:
+            
+            pyNodeList.append(pm.PyNode(jnt))
+        
+        result = self.m_rigElement.genArmRig(pyNodeList,
+                    _doIK = self.m_ikCheck.getValue(),
+                    _ikExt = self.m_ikExt,
+                    _doFK = self.m_fkCheck.getValue(),
+                    _fkExt = self.m_fkExt,
+                    _jntExt = self.m_jntExt,
+                    _ctrlExt = self.m_ctrlExt,
+                    _doTwist = self.m_twistCheck.getValue(), 
+                    _twistStartIds = [-2],
+                    _numTwistJnts = self.m_numTwistJnts
+                    )
+                    
+        #############DEAL WITH RESULT##################
         
                                      
 
 #----------END-ArmTabNovice-Class----------#       
+

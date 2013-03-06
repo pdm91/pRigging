@@ -9,6 +9,7 @@ import pRigging.src.ui.armtabintermediate as pati
 import pRigging.src.ui.armtabexperienced as pate
 import pRigging.src.armrig as par
 import pRigging.src.ui.tabsettings as pts
+import pRigging.src.ui.helpbox as phb
 
 #----------GUI-Class----------#
 
@@ -32,8 +33,16 @@ class Gui (prb.RiggingBase):
             self.m_windowName:      The name of the window ui object being created
         
         Imports:
-            pymel.core
+            pymel.core as pm
             os
+            pRigging.src.riggingbase as prb
+            pRigging.src.ui.starttabnovice as pstn
+            pRigging.src.ui.armtabnovice as patn
+            pRigging.src.ui.armtabintermediate as pati
+            pRigging.src.ui.armtabexperienced as pate
+            pRigging.src.armrig as par
+            pRigging.src.ui.tabsettings as pts
+            pRigging.src.ui.helpbox as phb
     """
     
     def __init__(self):
@@ -67,11 +76,7 @@ class Gui (prb.RiggingBase):
         #rig components
         
         self.m_rigComponents = []
-        
-        #first startup boolean
-        
-        self.m_firstStartup = True
-        
+                
         #if the prefs file isn't empty
         
         if os.path.isfile(os.path.expandvars(self.m_toolRoot+".prefs/helpLevel.txt")) == True:
@@ -99,77 +104,61 @@ class Gui (prb.RiggingBase):
         
             self.m_skillLevel = 'Novice'
         
-        #generate the gui
+        #generate the gu   
+        #check the existance of the window currently
         
-        self.genGui(self.m_skillLevel)
+        if pm.window(self.m_windowName, exists=True):
+            pm.deleteUI(self.m_windowName)
+                    
+        #create the window
         
-        """--------------------"""
-  
-        
-    def genGui (self, _skillLevel):
-        
-        """
-            Method: genGui
-                A method called by the init method and whenever the GUI has to be updated,
-                does all of the GUI generation
-            
-            Inputs:
-                self:                   A pointer to the instance of the GUI class of which
-                                        this method is being called
-                _skillLevel:            A string reperesenting the chosen skill level of the
-                                        user, used to define the generation of the UI
-            
-            On Exit:                    The UI has been generated and shown
-        """
-        
-        if (self.m_firstStartup):
-        
-            #check the existance of the window currently
-            
-            if pm.window(self.m_windowName, exists=True):
-                pm.deleteUI(self.m_windowName)
-                        
-            #create the window
-            
-            self.m_window = pm.window(self.m_windowName, title = "Rigging Tools")
-                       
-            #create the form layout that contains the overall window
-            
-            self.m_outerForm = pm.formLayout(numberOfDivisions = 100)
-            
-            #map from help skill level string to int - may be replaced with an actual map object
-            
-            i = 1
-            
-            if self.m_skillLevel == "Novice":
-                i = 1
-            elif self.m_skillLevel == "Intermediate":
-                i = 2
-            elif self.m_skillLevel == "Experienced":
-                i = 3
-            
-            #create the user skill radio buttons
-            
-            self.m_userSkillRB = pm.radioButtonGrp(
-                        label='User Skill: ', 
-                        labelArray3=['Novice', 'Intermediate', 'Experienced'], 
-                        numberOfRadioButtons=3, 
-                        on1 = pm.Callback(self.updateSkillLevel, "Novice"),  
-                        on2 = pm.Callback(self.updateSkillLevel,"Intermediate"),  
-                        on3 = pm.Callback(self.updateSkillLevel,"Experienced"),
-                        sl = i)
-           
-            #set the first startup boolean
-            
-            self.m_firstStartup = False
-            
-            #create the tab layout
+        self.m_window = pm.window(self.m_windowName, title = "pRigging")
                    
-            self.m_tabs = pm.tabLayout(innerMarginWidth=5, innerMarginHeight=5)
-            
-            #create the initial tab
-            
-            self.m_tabList.append(pstn.StartTabNovice(self.m_tabs,self,"General"))
+        #create the form layout that contains the overall window
+        
+        self.m_outerForm = pm.formLayout(numberOfDivisions = 100)
+        
+        #map from help skill level string to int - may be replaced with an actual map object
+        
+        i = 1
+        
+        if self.m_skillLevel == "Novice":
+            i = 1
+        elif self.m_skillLevel == "Intermediate":
+            i = 2
+        elif self.m_skillLevel == "Experienced":
+            i = 3
+        
+        #create the user skill radio buttons
+        
+        self.m_userSkillRB = pm.radioButtonGrp(
+                    label='User Skill: ', 
+                    labelArray3=['Novice', 'Intermediate', 'Experienced'], 
+                    numberOfRadioButtons=3, 
+                    on1 = pm.Callback(self.updateSkillLevel, "Novice"),  
+                    on2 = pm.Callback(self.updateSkillLevel,"Intermediate"),  
+                    on3 = pm.Callback(self.updateSkillLevel,"Experienced"),
+                    sl = i)
+        
+        #create the show/hide buttons
+        
+        self.m_hideRigButton = pm.button(l = "Hide Rig")        
+        self.m_hideChainButton = pm.button(l = "Hide Current Chain")
+        self.m_showRigButton = pm.button(l = "Show Rig")        
+        self.m_showChainButton = pm.button(l = "Show Current Chain")
+        
+        self.m_helpBox = phb.HelpBox(self.m_outerForm)
+        helpBoxUI = self.m_helpBox.getTopUI()   
+        
+        pm.setParent(self.m_outerForm)   
+        
+        #create the tab layout
+               
+        self.m_tabs = pm.tabLayout(innerMarginWidth=5, innerMarginHeight=5)
+        
+        #create the initial tab
+        
+        self.m_tabList.append(pstn.StartTabNovice(self.m_tabs,self,"General"))
         
         #attach the tabs and the radio buttons to the form layout
         
@@ -181,9 +170,32 @@ class Gui (prb.RiggingBase):
         self.m_outerForm.attachControl(self.m_tabs, 'top', 5, self.m_userSkillRB)
                                      
         self.m_outerForm.attachPosition(self.m_tabs, 'right', 0,70)
+          
+        #attach the buttons
                                        
-        self.m_outerForm.attachNone(self.m_userSkillRB, 'bottom')
-                    
+        self.m_outerForm.attachForm(self.m_hideRigButton, 'right', 20)
+        self.m_outerForm.attachForm(self.m_hideChainButton, 'right', 20)
+        self.m_outerForm.attachForm(self.m_showRigButton, 'right', 20)
+        self.m_outerForm.attachForm(self.m_showChainButton, 'right', 20)
+        
+
+        self.m_outerForm.attachPosition(self.m_hideRigButton, 'left', 10, 70)
+        self.m_outerForm.attachPosition(self.m_hideChainButton, 'left', 10, 70)
+        self.m_outerForm.attachPosition(self.m_showRigButton, 'left', 10, 70)
+        self.m_outerForm.attachPosition(self.m_showChainButton, 'left', 10, 70)
+        
+        self.m_outerForm.attachControl(self.m_hideRigButton, 'top', 10, self.m_userSkillRB)
+        self.m_outerForm.attachControl(self.m_hideChainButton, 'top', 10, self.m_hideRigButton)
+        self.m_outerForm.attachControl(self.m_showRigButton, 'top', 10, self.m_hideChainButton)
+        self.m_outerForm.attachControl(self.m_showChainButton, 'top', 10, self.m_showRigButton)
+        
+        #attach the helpbox
+        
+        self.m_outerForm.attachForm(helpBoxUI, 'right', 10)
+        self.m_outerForm.attachForm(helpBoxUI, 'bottom', 10)
+        self.m_outerForm.attachPosition(helpBoxUI, 'left', 10, 70)
+        self.m_outerForm.attachControl(helpBoxUI, 'top', 10,self.m_showChainButton) 
+                            
         #show window 
         
         pm.showWindow(self.m_window)
@@ -206,7 +218,7 @@ class Gui (prb.RiggingBase):
             On Exit:                    The UI has been regenerated and shown based on the
                                         radio Button input 
         """
-        
+         
         #check that the skill level has changed
         
         if self.m_skillLevel != _newLevel:
@@ -223,19 +235,17 @@ class Gui (prb.RiggingBase):
                 
                 #get the type
                 
-                type = self.m_tabList[i].getType()
+                type = self.m_tabList[i].getTabType()
                 
                 if type == "arm":
                     
                     #clear the current tab storing the settings
                     
-                    settings = self.m_tabList[i].clear()
+                    settings = self.m_tabList[i].clearTab()
                     
                     #replace the existing tab with a new one,
                     #this will take the reference count of the tab to
                     #0 and python will remove it
-                    
-                    self.m_tablist[i] = pate.ArmTabExperienced(self.m_tabs,self, settings)
                     
                     if self.m_skillLevel == "Novice":
                         
@@ -313,7 +323,10 @@ class Gui (prb.RiggingBase):
             
                 self.m_tabList.append(pate.ArmTabExperienced(self.m_tabs,self, settings))
             
-            self.m_tabs.setSelectTabIndex(len(self.m_tabList))           
+            self.m_tabs.setSelectTabIndex(len(self.m_tabList))
+            
+            
+
 
             
             
@@ -333,13 +346,13 @@ def lrPrompt():
 
     #set size
     
-    pm.formLayout(form, e=True, width=300)
+    pm.formLayout(form, e=True, width=300, height = 50)
 
     #set the text for the window
 
     t = pm.text(l='What side do you want to start working on?')
     
-    #buttons
+    #buttons 
 
     b1 = pm.button(l='Left', c='pm.layoutDialog( dismiss="L" )' )
     b2 = pm.button(l='Centre', c='pm.layoutDialog( dismiss="C" )' )
@@ -364,8 +377,6 @@ def lrPrompt():
     
 
 #----------END-GUI-Class----------#       
-reload(pate)
-reload(patn)
-reload(pati)
-reload(pts)
+reload(par)
+reload (patn)
 gui = Gui()

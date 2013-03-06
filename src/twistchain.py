@@ -60,7 +60,8 @@ class TwistChain(pjcc.JointChainContainer):
                         _name = "",
                         _addConnection = True,
                         _acon = True,
-                        _attr = "rx"
+                        _attr = "rx",
+                        _jntExt = ""
                         ):
         
         """
@@ -92,7 +93,8 @@ class TwistChain(pjcc.JointChainContainer):
                                                 _bottomJoint,
                                                 _numJoints,
                                                 _nameList = _nameList, 
-                                                _name = _name
+                                                _name = _name,
+                                                _ext = _jntExt
                                                 )
                                                 
         #then if the acon bool is set
