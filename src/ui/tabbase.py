@@ -31,7 +31,7 @@ class TabBase(prb.RiggingBase):
             pRigging.src.riggingbase as prb     
     """
     
-    def __init__(self,_parent,_guiInstance,_name, _rigElement, _type):
+    def __init__(self,_parent,_guiInstance,_name, _rigElement, _type, _baseName):
         
         """
             Method: __init__
@@ -89,6 +89,10 @@ class TabBase(prb.RiggingBase):
         #set up the rig component
         
         self.m_rigElement = _rigElement
+        
+        #store the rig base name and the side specifier
+        
+        self.m_rigName = _baseName
         
     def getTabType(self):
         

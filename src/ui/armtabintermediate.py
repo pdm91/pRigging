@@ -42,7 +42,7 @@ class ArmTabIntermediate(ptb.TabBase):
         
         #initialise the base class
         
-        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm')
+        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm', _settings.m_baseName)
         
         #and initialise variables to stor the settings that are not stores by a ui element
         
@@ -66,7 +66,7 @@ class ArmTabIntermediate(ptb.TabBase):
         
         #-------------step 1 control generate-------------#
         
-        self.m_jointToolButton = pm.button(l = "Joint Tool")
+        self.m_jointToolButton = pm.button(l = "Joint Tool",  c = 'pm.runtime.JointTool()')
         
         #-------------step 2 text generate-------------#
         
@@ -80,7 +80,7 @@ class ArmTabIntermediate(ptb.TabBase):
         
         #-------------step 2 control generate-------------#
         
-        self.m_nameOverrideCheck =  pm.checkBox(ann = "override the limb name?", v = False, l = "")
+        self.m_nameOverrideCheck =  pm.checkBox(ann = "override the limb name?", v = False, l = "", onc = pm.Callback(self.nameTextEnable, True), ofc = pm.Callback(self.nameTextEnable, False))
         self.m_nameOverrideText = pm.textField(tx = _settings.m_limbName, ann = "Enter the name of the rig here", en = False)
         
         #-------------step 3 text generate-------------#
@@ -95,12 +95,12 @@ class ArmTabIntermediate(ptb.TabBase):
                                     
         #-------------step 3 control generate-------------#
         
-        self.m_jointTable = pm.textScrollList()
+        self.m_jointTable = pm.textScrollList(ams = True)
         
         for tempJnt in _settings.m_jntList:
             self.m_jointTable.append(tempJnt)
         
-        self.m_loadJointsButton = pm.button(l = "Load Joints")
+        self.m_loadJointsButton = pm.button(l = "Load Joints", c = pm.Callback(self.loadJoints))
         
         #-------------step 4 text generate-------------#
                 
@@ -134,7 +134,7 @@ class ArmTabIntermediate(ptb.TabBase):
                                     ww = True)
         self.m_numTwistJntsVal = pm.intField(v = _settings.m_numTwistJnts, ann = "Enter the number of twist joints to\n generate in each twist chain\n ignored if no joints selected to be\n the roots of twist chains")       
                 
-        self.m_genRigButton = pm.button(l = "Generate Rig")
+        self.m_genRigButton = pm.button(l = "Generate Rig", c = pm.Callback(self.genChain))
         self.m_reGenRigButton = pm.button(l = "Regenerate rig")
         
         #-------------misc control generate-------------#
@@ -267,6 +267,7 @@ class ArmTabIntermediate(ptb.TabBase):
         
         #store the appropriate values in the TabSettings Object
         
+        settings.m_baseName = self.m_rigName
         settings.m_tabName = self.m_topLayout.shortName()
         settings.m_limbName = self.m_nameOverrideText.getText()
         settings.m_doSideSpecify = self.m_doSideSpecify
@@ -289,7 +290,121 @@ class ArmTabIntermediate(ptb.TabBase):
         
         return settings
         
-
-                                     
+    def setRigRootName(self):
+        
+        """
+            Method: setRigRootName
+                A method to set the root name of the rig element
+        """
+      
+        name = self.addExtToNames(self.addExtToNames([self.m_rigName], self.m_sideSpecifier), self.m_nameOverrideText.getText())[0]
+        
+        self.m_rigElement.setRootName(name)
+        
+    def nameTextEnable(self, _val):
+    
+        """
+            Method: nameTextEnable
+                A method to set the enable variable on the name override text field
+                
+            Inputs:
+                _val:               The value to set the enable variable to
+        """
+        
+        self.m_nameOverrideText.setEnable(_val)
+        
+    def loadJoints(self):
+        
+        """
+            Method: loadJoints
+                A method to load the selected joints into the list
+                
+            On Exit:                The template joints are loaded into the list.
+        """
+        
+        #empty the items loaded into the joint box
+        
+        self.m_jointTable.removeAll()
+        
+        selection = pm.ls(sl = True, type = "joint")
+        
+        for jnt in  selection:
+            
+            self.m_jointTable.append(jnt)
+            
+    def genChain(self):
+        
+        """
+            Method: genChain
+                A method to generate the joint chain
+        """
+        
+        #create a list of the unicode strings representing
+        #the selected joints and an empty list for their
+        #pynode counterparts
+        
+        strList = self.m_jointTable.getAllItems()
+        pyNodeList = []
+        
+        #cycle through and convert to pyNode
+        
+        for jnt in strList:
+            
+            pyNodeList.append(pm.PyNode(jnt))
+            
+        #enfoce the hierarchy
+        
+        pyNodeList = self.enforceHierarchy(pyNodeList)
+        
+        #get a list of the selected items
+        
+        twistRootList = self.m_jointTable.getSelectItem()
+        
+        #variable defining whether or not to generate a twist chain
+        
+        doTwist = True
+        
+        if twistRootList == []:
+        
+            doTwist = False
+        
+        #generate a list for the twist root indices
+        
+        indexList = []
+        
+        #then cycle through the ordered pynode list
+        
+        for i in range (0, len(pyNodeList)-1):
+                        
+            #cycle through all of the selected joints
+            
+            for jnt in twistRootList:
+                
+                #if they are the same, add the id into the list
+                
+                if jnt == pyNodeList[i]:
+                    
+                    indexList.append(i)
+                    
+        #and set the root name for the arm
+        
+        self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_nameOverrideText.getText())[0])
+        
+        result = self.m_rigElement.genArmRig(pyNodeList,
+                    _doIK = self.m_ikCheck.getValue(),
+                    _ikExt = self.m_ikExt,
+                    _doFK = self.m_fkCheck.getValue(),
+                    _fkExt = self.m_fkExt,
+                    _jntExt = self.m_jntExt,
+                    _ctrlExt = self.m_ctrlExt,
+                    _doTwist = doTwist, 
+                    _twistStartIds = indexList,
+                    _numTwistJnts =  self.m_numTwistJntsVal.getValue()
+                    )
+                    
+        #############DEAL WITH RESULT##################
+        
+        
+        
 
 #----------END-ArmTabIntermediate-Class----------#       

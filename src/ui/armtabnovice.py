@@ -42,7 +42,7 @@ class ArmTabNovice(ptb.TabBase):
         
         #initialise the base class
         
-        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm')
+        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm', _settings.m_baseName)
         
         #initialise variable to stor settings that are not stored in ui elements
         
@@ -211,6 +211,7 @@ class ArmTabNovice(ptb.TabBase):
         
         #store the appropriate values in the TabSettings Object
         
+        settings.m_baseName = self.m_rigName
         settings.m_tabName = self.m_topLayout.shortName()
         settings.m_limbName = self.m_limbName
         settings.m_doSideSpecify = self.m_doSideSpecify
@@ -271,6 +272,14 @@ class ArmTabNovice(ptb.TabBase):
         for jnt in strList:
             
             pyNodeList.append(pm.PyNode(jnt))
+            
+        #set the m_template joints equal to those passed in with hierarchy enforced
+        
+        pyNodeList = self.enforceHierarchy(pyNodeList)
+            
+        #and set the root name for the arm
+        
+        self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_limbName)[0])
         
         result = self.m_rigElement.genArmRig(pyNodeList,
                     _doIK = self.m_ikCheck.getValue(),

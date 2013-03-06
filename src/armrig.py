@@ -101,16 +101,10 @@ class ArmRig(prb.RiggingBase):
             On Exit:                The arm has been generated.
         """
         
-        #set the m_template joints equal to those passed in with hierarch enforced
+        #set the template joints
         
-        self.m_templateJoints = self.enforceHierarchy(_templateJoints)
-        
-        #return an error if the enforce hirearchy returns an error message
-        
-        if self.m_templateJoints == []:
-            
-            return ["ERROR","JOINT SELECTION","Error: Incorrect Joint selection, joints must be in a single hierarchy"] 
-        
+        self.m_templateJoints = _templateJoints[:]
+
         #get the number of joints inputted
         
         numJoints = len(self.m_templateJoints)
@@ -172,7 +166,7 @@ class ArmRig(prb.RiggingBase):
             #generate the IK chain
             
             self.m_ikChain = pic.IKChain()
-            
+
             self.m_ikChain.genChain(self.m_templateJoints, names, _extOverride = extOver, _jointExt = _jntExt, _controlExt = _ctrlExt)
             
         if _doFK:
@@ -308,6 +302,21 @@ class ArmRig(prb.RiggingBase):
         #takes in a Twist chain object and mirrors it to generate the chain
         
         pass
+        
+        """--------------------"""
+        
+    def setRootName(self, _name):
+    
+        """
+            Method: setRootName
+                Method to set the root name for the arm rig
+                
+            Inputs:
+                _name:                  The text to set the name to
+        """
+        
+        self.m_rootName = _name
+        
         
         """--------------------"""
         

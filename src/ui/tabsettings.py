@@ -25,6 +25,7 @@ class TabSettings:
             Inputs:
         """
         
+        self.m_baseName = ""
         self.m_tabName = ""
         self.m_limbName = ""
         self.m_doSideSpecify = True

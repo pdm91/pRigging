@@ -42,7 +42,7 @@ class ArmTabExperienced(ptb.TabBase):
         
                 #initialise the base class
         
-        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm')
+        ptb.TabBase.__init__(self,_parent,_guiInstance,_settings.m_tabName, _settings.m_rigElement, 'arm', _settings.m_baseName)
         
         #-------------name elements generate-------------#
         
@@ -212,6 +212,7 @@ class ArmTabExperienced(ptb.TabBase):
         
         #store the appropriate values in the TabSettings Object
         
+        settings.m_baseName = self.m_rigName
         settings.m_tabName = self.m_topLayout.shortName()
         settings.m_limbName = self.m_nameOverrideText.getText()
         settings.m_doSideSpecify = self.m_sideCheck.getValue()
@@ -234,6 +235,21 @@ class ArmTabExperienced(ptb.TabBase):
         
         return settings
         
+    def setRigRootName(self):
+        
+        """
+            Method: setRigRootName
+                A method to set the root name of the rig element
+        """
+        name = self.m_rigName
+        
+        if self.m_sideCheck.getValue() == True:
+            
+            name = self.addExtToNames([name], self.m_sideTextField.getText())[0]
+            
+        name = self.addExtToNames([name], self.m_nameOverrideText.getText())[0]
+        
+        self.m_rigElement.setRootName(name)
 
 
 #----------END-ArmTabExperienced-Class----------#       

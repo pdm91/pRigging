@@ -292,21 +292,24 @@ class Gui (prb.RiggingBase):
             
             side = pm.layoutDialog(t = "Pick Sides", ui = lrPrompt)
             
-            #generate the root name from the name stored in the start tab 
-            
-            name = self.addExtToNames([self.m_tabList[0].getRigName()],side)[0]
+
             
             #make an arm rig and add it to the rig components
             
-            arm = par.ArmRig(name)
-            self.m_rigComponents.append(arm)
+            
             
             #set up a settings object for the tab settings
             settings = pts.TabSettings()
             
+            settings.m_baseName = self.m_tabList[0].getRigName()
             settings.m_tabName = "Arm Tab"
             settings.m_limbName = "Arm"
             settings.m_sideSpecifier = side
+            
+            
+            arm = par.ArmRig(settings.m_baseName)
+            self.m_rigComponents.append(arm)
+            
             settings.m_rigElement = arm
             
             #switch through the dificulty levels
@@ -378,5 +381,5 @@ def lrPrompt():
 
 #----------END-GUI-Class----------#       
 reload(par)
-reload (patn)
+reload (pati)
 gui = Gui()
