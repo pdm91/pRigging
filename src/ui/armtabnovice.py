@@ -260,41 +260,110 @@ class ArmTabNovice(ptb.TabBase):
                 A method to generate the joint chain
         """
         
-        #create a list of the unicode strings representing
-        #the selected joints and an empty list for their
-        #pynode counterparts
+        #check if there is an existing joint chain
         
-        strList = self.m_jointTable.getAllItems()
-        pyNodeList = []
+        isChainExist  = self.m_rigElement.getIsGenerated()
+        force = "False"
         
-        #cycle through and convert to pyNode
-        
-        for jnt in strList:
+        if isChainExist:
             
-            pyNodeList.append(pm.PyNode(jnt))
+            #generate a dialog window to define the force variable
             
-        #set the m_template joints equal to those passed in with hierarchy enforced
-        
-        pyNodeList = self.enforceHierarchy(pyNodeList)
+            force = pm.layoutDialog(t = "Replace Chain?", ui = forcePrompt)
             
-        #and set the root name for the arm
+        if force == "True":
+            
+            #clear the rigElement
+            
+            self.m_rigElement.clear()
+            
+            #and set isChainExist to false
+            
+            isChainExist = False
+            
+        #if a chain doesn't exist at this point
         
-        self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_limbName)[0])
-        
-        result = self.m_rigElement.genArmRig(pyNodeList,
-                    _doIK = self.m_ikCheck.getValue(),
-                    _ikExt = self.m_ikExt,
-                    _doFK = self.m_fkCheck.getValue(),
-                    _fkExt = self.m_fkExt,
-                    _jntExt = self.m_jntExt,
-                    _ctrlExt = self.m_ctrlExt,
-                    _doTwist = self.m_twistCheck.getValue(), 
-                    _twistStartIds = [-2],
-                    _numTwistJnts = self.m_numTwistJnts
-                    )
-                    
+        if not isChainExist:        
+            
+            print "INGENERATION", isChainExist, force
+            #create a list of the unicode strings representing
+            #the selected joints and an empty list for their
+            #pynode counterparts
+            
+            strList = self.m_jointTable.getAllItems()
+            pyNodeList = []
+            
+            #cycle through and convert to pyNode
+            
+            for jnt in strList:
+                
+                pyNodeList.append(pm.PyNode(jnt))
+                
+            #set the m_template joints equal to those passed in with hierarchy enforced
+            
+            pyNodeList = self.enforceHierarchy(pyNodeList)
+                
+            #and set the root name for the arm
+            
+            self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideSpecifier),self.m_limbName)[0])
+            
+            result = self.m_rigElement.genArmRig(pyNodeList,
+                        _doIK = self.m_ikCheck.getValue(),
+                        _ikExt = self.m_ikExt,
+                        _doFK = self.m_fkCheck.getValue(),
+                        _fkExt = self.m_fkExt,
+                        _jntExt = self.m_jntExt,
+                        _ctrlExt = self.m_ctrlExt,
+                        _doTwist = self.m_twistCheck.getValue(), 
+                        _twistStartIds = [-2],
+                        _numTwistJnts = self.m_numTwistJnts
+                        )
+                        
         #############DEAL WITH RESULT##################
         
+def forcePrompt():
+    """
+        Method: forcePrompt
+            A procedure defining a layout prompt, global because it
+            breaks if it's in a class
+            
+        On Exit:            Returns a string defining the choice
+                            of the force or not
+    """
+    # Get the dialog's formLayout.
+    
+    form = pm.setParent(q=True)
+
+    #set size
+    
+    pm.formLayout(form, e=True, width=300, height = 50)
+
+    #set the text for the window
+
+    t = pm.text(l='A chain already exists, replace it?')
+    
+    #buttons 
+
+    b1 = pm.button(l='Yes', c='pm.layoutDialog( dismiss="True" )' )
+    b2 = pm.button(l='No', c='pm.layoutDialog( dismiss="False" )' )
+
+    #set up the positioning of the elements
+
+    form.attachForm(t, 'top', 5)
+    form.attachForm(t, 'left', 5)
+    form.attachForm(t, 'right', 5)
+    form.attachForm(b1, 'left', 5)
+    form.attachForm(b2, 'right', 5)
+    form.attachForm(b1, 'bottom', 5)
+    form.attachForm(b2, 'bottom', 5)
+    
+    form.attachControl(b1, 'top', 5, t)
+    form.attachControl(b2, 'top', 5, t)
+
+    form.attachPosition(b1, 'right', 5, 50)
+    form.attachPosition(b2, 'left', 5, 50)
+
+
                                      
 
 #----------END-ArmTabNovice-Class----------#       

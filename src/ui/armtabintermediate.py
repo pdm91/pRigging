@@ -135,7 +135,7 @@ class ArmTabIntermediate(ptb.TabBase):
         self.m_numTwistJntsVal = pm.intField(v = _settings.m_numTwistJnts, ann = "Enter the number of twist joints to\n generate in each twist chain\n ignored if no joints selected to be\n the roots of twist chains")       
                 
         self.m_genRigButton = pm.button(l = "Generate Rig", c = pm.Callback(self.genChain))
-        self.m_reGenRigButton = pm.button(l = "Regenerate rig")
+        self.m_reGenRigButton = pm.button(l = "Regenerate rig", c = pm.Callback(self.reGenChain))
         
         #-------------misc control generate-------------#
         
@@ -404,7 +404,15 @@ class ArmTabIntermediate(ptb.TabBase):
                     
         #############DEAL WITH RESULT##################
         
+    def reGenChain(self):
         
+        """
+            Method: reGenChain
+                A method to regenerate the chain based on a new set of parameters
+        """
+        
+        self.m_rigElement.clear()
+        self.genChain()
         
 
 #----------END-ArmTabIntermediate-Class----------#       
