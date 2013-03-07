@@ -94,7 +94,7 @@ class ArmTabExperienced(ptb.TabBase):
         #-------------final buttons generate-------------# 
                 
         self.m_genRigButton = pm.button(l = "Generate Rig", c = pm.Callback(self.genChain))
-        self.m_reGenRigButton = pm.button(l = "Regenerate rig", c = pm.Callback(self.reGenChain))
+        self.m_reGenRigButton = pm.button(l = "Regenerate Rig", c = pm.Callback(self.reGenChain))
         
         #-------------misc control generate-------------#
         
@@ -318,93 +318,101 @@ class ArmTabExperienced(ptb.TabBase):
                 A method to generate the joint chain
         """
         
-        #create a list of the unicode strings representing
-        #the selected joints and an empty list for their
-        #pynode counterparts
+        #if the rig element already exists
         
-        strList = self.m_jointTable.getAllItems()
-        pyNodeList = []
-        
-        #cycle through and convert to pyNode
-        
-        for jnt in strList:
+        if self.m_rigElement.getIsGenerated() == True:
             
-            pyNodeList.append(pm.PyNode(jnt))
+            self.m_gui.getHelp().update( _errorList = ["ERROR","ALREADY MADE","ERROR: The currently active rig element is aready generated, if you want to relpace it, click the \"Regenerate Rig\" button"])
             
-        #check that there are some joints
-        
-        if pyNodeList == []:
-            
-            #currently print, will be refactored to use the help box
-            
-             self.m_gui.getHelp().update( _errorList = ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"])
-            
-        #otherwise continue with the generation
-        
         else:
-        
-            #enfoce the hierarchy
             
-            pyNodeList = self.enforceHierarchy(pyNodeList)
+            #create a list of the unicode strings representing
+            #the selected joints and an empty list for their
+            #pynode counterparts
             
-            #now check if there is any nodes in the joint list
+            strList = self.m_jointTable.getAllItems()
+            pyNodeList = []
+            
+            #cycle through and convert to pyNode
+            
+            for jnt in strList:
+                
+                pyNodeList.append(pm.PyNode(jnt))
+                
+            #check that there are some joints
             
             if pyNodeList == []:
                 
-                #temp print, will use the help box eventually
+                #currently print, will be refactored to use the help box
                 
-                self.m_gui.getHelp().update( _errorList =["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"])
+                 self.m_gui.getHelp().update( _errorList = ["ERROR","NO JOINTS","ERROR: No joints were passed in to generate the rig from"])
+                
+            #otherwise continue with the generation
             
             else:
-
             
-                #get a list of the selected items
+                #enfoce the hierarchy
                 
-                twistRootList = self.m_jointTable.getSelectItem()
+                pyNodeList = self.enforceHierarchy(pyNodeList)
                 
-                #variable defining whether or not to generate a twist chain
+                #now check if there is any nodes in the joint list
                 
-                doTwist = True
+                if pyNodeList == []:
+                    
+                    #temp print, will use the help box eventually
+                    
+                    self.m_gui.getHelp().update( _errorList =["ERROR","INCORRECT HIERARCHY","ERROR: The joints selected were not in a single hierarchy, either a joint was missing or one of them had two immediate children in the selection with it"])
                 
-                if twistRootList == []:
+                else:
+
                 
-                    doTwist = False
-                
-                #generate a list for the twist root indices
-                
-                indexList = []
-                
-                #then cycle through the ordered pynode list
-                
-                for i in range (0, len(pyNodeList)-1):
+                    #get a list of the selected items
+                    
+                    twistRootList = self.m_jointTable.getSelectItem()
+                    
+                    #variable defining whether or not to generate a twist chain
+                    
+                    doTwist = True
+                    
+                    if twistRootList == []:
+                    
+                        doTwist = False
+                    
+                    #generate a list for the twist root indices
+                    
+                    indexList = []
+                    
+                    #then cycle through the ordered pynode list
+                    
+                    for i in range (0, len(pyNodeList)-1):
+                                    
+                        #cycle through all of the selected joints
+                        
+                        for jnt in twistRootList:
+                            
+                            #if they are the same, add the id into the list
+                            
+                            if jnt == pyNodeList[i]:
                                 
-                    #cycle through all of the selected joints
+                                indexList.append(i)
+                                
+                    #and set the root name for the arm
                     
-                    for jnt in twistRootList:
-                        
-                        #if they are the same, add the id into the list
-                        
-                        if jnt == pyNodeList[i]:
-                            
-                            indexList.append(i)
-                            
-                #and set the root name for the arm
-                
-                self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideTextField.getText()),self.m_nameOverrideText.getText())[0])
-                
-                result = self.m_rigElement.genArmRig(pyNodeList,
-                            _doIK = self.m_ikCheck.getValue(),
-                            _ikExt = self.m_ikExt.getText(),
-                            _doFK = self.m_fkCheck.getValue(),
-                            _fkExt = self.m_fkExt.getText(),
-                            _jntExt = self.m_jointExt.getText(),
-                            _ctrlExt = self.m_controlExt.getText(),
-                            _doTwist = doTwist, 
-                            _twistStartIds = indexList,
-                            _numTwistJnts =  self.m_numTwistJntsVal.getValue()
-                            )
+                    self.m_rigElement.setRootName(self.addExtToNames(self.addExtToNames([self.m_rigName],self.m_sideTextField.getText()),self.m_nameOverrideText.getText())[0])
                     
-                self.m_gui.getHelp().update( _errorList = result)
+                    result = self.m_rigElement.genArmRig(pyNodeList,
+                                _doIK = self.m_ikCheck.getValue(),
+                                _ikExt = self.m_ikExt.getText(),
+                                _doFK = self.m_fkCheck.getValue(),
+                                _fkExt = self.m_fkExt.getText(),
+                                _jntExt = self.m_jointExt.getText(),
+                                _ctrlExt = self.m_controlExt.getText(),
+                                _doTwist = doTwist, 
+                                _twistStartIds = indexList,
+                                _numTwistJnts =  self.m_numTwistJntsVal.getValue()
+                                )
+                        
+                    self.m_gui.getHelp().update( _errorList = result)
 
     def getInfo(self):
         """

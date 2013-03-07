@@ -262,6 +262,12 @@ class HelpBox():
                     
                     text = text + "This is part of a spine element " +sideText + " of the rig.\n\n"
                     
+                #and if there is still no text
+                
+                if text == "":
+                    
+                    text = "Unknown object"
+                    
                 self.m_helpText.setLabel(text)
             else:
                 

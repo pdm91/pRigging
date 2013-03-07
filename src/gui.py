@@ -195,7 +195,7 @@ class Gui (prb.RiggingBase):
         
         #attach the helpbox
         
-        self.m_outerForm.attachForm(helpBoxUI, 'right', 10)
+        self.m_outerForm.attachForm(helpBoxUI, 'right', 20)
         self.m_outerForm.attachForm(helpBoxUI, 'bottom', 10)
         self.m_outerForm.attachPosition(helpBoxUI, 'left', 10, 70)
         self.m_outerForm.attachControl(helpBoxUI, 'top', 10,self.m_showChainButton) 

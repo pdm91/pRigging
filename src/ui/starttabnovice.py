@@ -95,9 +95,7 @@ class StartTabNovice(prb.RiggingBase):
         #add buttons
         
         self.m_addArmButton = pm.button(l = "Add Arm", c= pm.Callback(self.m_gui.addTab, "arm"))
-        
-        self.m_addLegButton = pm.button(l = "Add Leg",c= pm.Callback(self.m_gui.addTab, "leg"))
-        
+                
         #attach the first text to the form
         
         self.m_topLayout.attachForm(self.m_step1Label, 'left', 20)
@@ -133,10 +131,6 @@ class StartTabNovice(prb.RiggingBase):
         
         self.m_topLayout.attachControl(self.m_addArmButton, 'top', 20, self.m_step2Text)
         
-        self.m_topLayout.attachForm(self.m_addLegButton, 'left', 30)
-        self.m_topLayout.attachForm(self.m_addLegButton, 'right', 20)
-        
-        self.m_topLayout.attachControl(self.m_addLegButton, 'top', 20, self.m_addArmButton)
         
     def getRigName(self):
         
